@@ -35,7 +35,7 @@ const userSchema: ZodType<User> = z.object({
 function ProfileTab() {
     const navigate = useNavigate();
     const currentUser = useAppSelector(state => state.auth.user);
-    const { register, control, handleSubmit, formState: { errors, isDirty }, reset, getValues } = useForm<User>({ resolver: zodResolver(userSchema) });
+    const { register, control, handleSubmit, formState: { errors, isDirty }, reset } = useForm<User>({ resolver: zodResolver(userSchema) });
     const { field: { onChange } } = useController({ name: 'gender', control });
     const { field: { onChange: onChangeDateOfBirth, value: dateOfBirth } } = useController({ name: 'dateOfBirth', control });
     const [showUploadAvatar, setShowUploadAvatar] = useState(false);

@@ -204,7 +204,7 @@ export default function Call({ children }: ContextChildren) {
                 ref={partnerVideoRef}
                 onUnload={handleLeaveCall}
                 actions={{ endCall: handleLeaveCall }}
-                callInfo={{ chatNameAndPhoto: currentChatRoomInfo, callType: callerData?.callType }}
+                callInfo={{ chatRoomInfo: currentChatRoomInfo, callType: callerData?.callType }}
 
             />
             <ReceivingCallModal open={callStatus.receivingCall} handleAcceptCallClick={acceptCall} handleDeclineCallClick={declineCall} />

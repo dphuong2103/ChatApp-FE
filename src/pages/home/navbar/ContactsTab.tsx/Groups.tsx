@@ -4,7 +4,7 @@ import styles from '../../../../styles/Groups.module.scss';
 import { ChatRoomSummary } from '../../../../types/dataType';
 function Groups() {
     const { chatRoomSummaries } = useChatRoomSummaryContext();
-    const [groups, setGroups] = useState<ChatRoomSummary[]>([]);
+    const [, setGroups] = useState<ChatRoomSummary[]>([]);
 
     useEffect(() => {
         let groups = chatRoomSummaries.filter(ChatRoomSummary => ChatRoomSummary.chatRoom.chatRoomType === 'MANY');

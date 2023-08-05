@@ -10,7 +10,7 @@ import { useDebounce } from '../../../../hooks/useDounceSearch';
 import { filterChatRoom, removeDuplicateChat } from '../../../../helper/chatRoomHelper';
 import { isUser, isChatRoomSummary } from '../../../../helper/checkType';
 function SearchChats() {
-  const { searchInput, setSearchInput } = useSearchInput();
+  const { searchInput } = useSearchInput();
   const [searchResult, setSearchResult] = useState<(ChatRoomSummary | User)[]>([]);
   const { chatRoomSummaries } = useChatRoomSummaryContext();
   const searchInputDebounce = useDebounce(searchInput, 400);
@@ -21,7 +21,7 @@ function SearchChats() {
     searchAndFilter();
     async function searchAndFilter() {
       if (searchInputDebounce === '') {
-        setSearchResult([]);
+      setSearchResult([]);
         return;
       }
 

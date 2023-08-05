@@ -15,7 +15,7 @@ function Friends() {
     const [filteredFriends, setFilteredFriends] = useState<TFriend[]>([]);
     const { relationships, chatRoomSummaries } = useChatRoomSummaryContext();
     const { handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
-    const { searchInput, setSearchInput } = useSearchInput();
+    const { searchInput } = useSearchInput();
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const navigate = useNavigate();
 

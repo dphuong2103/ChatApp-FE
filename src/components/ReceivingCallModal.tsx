@@ -1,10 +1,10 @@
 import { IconButton, Modal, Typography } from '@mui/material'
-import { ChatNameAndPhoto } from '../types/dataType'
+import { ChatRoomInfo } from '../types/dataType'
 import styles from '../styles/CallingModal.module.scss';
 import Avatar from './Avatar';
 import answerCallIcon from '../assets/imgs/answercallicon.svg';
 import declineCallIcon from '../assets/imgs/declinecallicon.svg'
-function ReceivingCallModal({ open, chatNameAndPhoto, handleAcceptCallClick, handleDeclineCallClick }: CallingProps) {
+function ReceivingCallModal({ open, handleAcceptCallClick, handleDeclineCallClick }: CallingProps) {
     return (
         <Modal open={open} className={styles['modal-backdrop']}>
             <div className={styles['calling-modal-container']}>
@@ -28,7 +28,7 @@ export default ReceivingCallModal
 
 type CallingProps = {
     open: boolean,
-    chatNameAndPhoto?: ChatNameAndPhoto,
+    chatRoomInfo?: ChatRoomInfo,
     handleAcceptCallClick: () => void,
     handleDeclineCallClick: () => void
 }

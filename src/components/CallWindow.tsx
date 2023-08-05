@@ -1,5 +1,5 @@
 import NewWindow from 'react-new-window'
-import { CallStatus, CallType, ChatNameAndPhoto } from '../types/dataType'
+import { CallStatus, CallType,  ChatRoomInfo } from '../types/dataType'
 import { forwardRef, useState } from 'react'
 import Avatar from './Avatar'
 import styles from '../styles/CallWindow.module.scss'
@@ -8,7 +8,7 @@ import { Microphone, MicrophoneSlash, PhoneX } from 'phosphor-react'
 import { generateClassName } from '../utils/generateClassName'
 type CallWindowProps = {
     callInfo: {
-        chatNameAndPhoto: ChatNameAndPhoto | null,
+        chatRoomInfo: ChatRoomInfo | null,
         callType?: CallType
     }
     callStatus: CallStatus,
@@ -23,8 +23,8 @@ const CallWindow = forwardRef<HTMLVideoElement, CallWindowProps>(({ callStatus, 
             {callStatus.calling &&
                 <>
                     <div className={styles['calling-container']}>
-                        <Avatar name={callInfo.chatNameAndPhoto?.name} imgUrl={callInfo.chatNameAndPhoto?.imgUrl} />
-                        <Typography color='white' variant='h5'>{callInfo.chatNameAndPhoto?.name}</Typography>
+                        <Avatar name={callInfo.chatRoomInfo?.name} imgUrl={callInfo.chatRoomInfo?.imgUrl} />
+                        <Typography color='white' variant='h5'>{callInfo.chatRoomInfo?.name}</Typography>
                         <Typography color='white' variant='body1'>Calling...</Typography>
                         <div className={styles['actions-container']}>
                             <IconButton className={styles.action}>

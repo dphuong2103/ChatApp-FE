@@ -1,0 +1,18 @@
+.modal-backdrop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & .upload-avatar-container {
+        background-color: white;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    & .actions-container {
+        display: flex;
+        justify-content: space-around;
+    }
+}

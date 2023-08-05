@@ -1,0 +1,30 @@
+.relationship-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem;
+    background-color: white;
+    gap: 2rem;
+
+    &.not-friend {
+        &>button {
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+    }
+
+    &.request-sent {
+        &>button {
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+}

@@ -1,0 +1,113 @@
+@import './variables.scss';
+
+.message-container {
+    display: flex;
+    width: 100%;
+
+    &.right {
+        flex-direction: row-reverse;
+    }
+
+    &:hover .message-actions-container {
+        display: flex;
+    }
+}
+
+
+.message-card {
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    max-width: 70%;
+
+    &.right {
+        flex-direction: row-reverse;
+
+        & .message-info {
+            background-color: #e5efff;
+
+        }
+    }
+
+    & .avatar {
+        height: 2.5rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+    }
+
+    & .message-info {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem;
+        border-radius: 10px;
+        gap: 0.2rem;
+        word-wrap: break-word;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow: hidden;
+
+        & .time {
+            color: grey;
+            font-size: 0.80rem;
+        }
+
+        & .reply-message-container {
+            overflow: hidden;
+            position: relative;
+            padding-left: 0.5rem;
+
+            & .reply-message {
+                display: inline-block;
+                width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            &::before {
+                content: '';
+                width: 2px;
+                height: 90%;
+                background: #3989ff;
+                position: absolute;
+                left: 0px;
+            }
+
+            &.d-none {
+                display: none;
+            }
+
+        }
+
+    }
+}
+
+.message-actions-container {
+    display: flex;
+    align-items: center;
+    background: #c5c7c7;
+    align-self: center;
+    padding: 0.4rem;
+    border-radius: 10px;
+    gap: 0.5rem;
+    display: none;
+    justify-content: center;
+
+    & .action {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        color: white;
+        border: none;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            color: blue;
+        }
+    }
+}

@@ -1,0 +1,20 @@
+@import './global.scss';
+
+.nav-bar-container {
+    width: 100%;
+    height: 100%;
+
+    &.d-none {
+        display: none;
+
+        @include notMobile {
+            display: initial;
+        }
+    }
+
+    @include notMobile {
+        // width: initial;
+        max-width: 20rem;
+        border-right: 1px solid lightgray;
+    }
+}

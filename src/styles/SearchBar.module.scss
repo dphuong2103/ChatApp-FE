@@ -1,0 +1,29 @@
+@import './variables.scss';
+
+.search-bar-container {
+    padding: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    background-color: #f4f4f5;
+    border-radius: 50px;
+
+    &.focus {
+        outline: 1px solid #6daff1;
+        background-color: white;
+    }
+
+    &>input {
+        border: none;
+        background: none;
+        width: 100%;
+        padding: 0.3rem 1rem;
+        line-height: 1.5rem;
+        &::placeholder {
+            color: grey;
+            font: $fonts-regular ;
+        }
+        
+    }
+}

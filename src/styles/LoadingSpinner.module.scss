@@ -1,0 +1,22 @@
+.background {
+    background: none repeat scroll 0 0 black;
+    position: fixed;
+    display: block;
+    opacity: 0.5;
+    z-index: 999; // or, higher
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.spinner__container {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

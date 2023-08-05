@@ -1,0 +1,16 @@
+@import './global.scss';
+
+.empty-chat-container {
+
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+
+    @include notMobile {
+        background-image: url('../assets/imgs/background.jpg');
+    }
+}

@@ -1,0 +1,111 @@
+@import './variables.scss';
+
+.user-info-modal-backdrop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: min(25rem, 90%);
+    border-radius: 5px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 0rem 0rem 1rem;
+}
+
+.title-container {
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.general-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.5rem;
+
+    & .actions-request-received-container {
+        display: flex;
+        gap: 1rem;
+
+    }
+
+    & .friendship-actions {
+        display: flex;
+        gap: 0.5rem;
+        color: black;
+        padding: 0rem 1rem;
+        width: 100%;
+
+        & .btn {
+            border: none;
+            background: none;
+            width: 100%;
+            border-radius: 5px;
+            padding: 0.7rem;
+            background-color: #eaedf0;
+            font-weight: 500;
+            font-size: $text-sizes-components-button-g;
+            line-height: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            color: rgb(90, 90, 90);
+        }
+    }
+
+    &::after {
+        content: '';
+        position: 'absolute';
+        right: 0;
+        left: 0;
+        height: 8px;
+        width: 100%;
+        background-color: #eef0f1;
+    }
+}
+
+.title {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.personal-info-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    overflow: hidden;
+    & .personal-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    & .info-container {
+        display: flex;
+        font-size: $text-sizes-text-regular-s ;
+        padding: 0.6rem;
+    }
+
+    & .info-title {
+        width: 8rem;
+        min-width: 8rem;
+        color: grey;
+    }
+
+    & .bio {
+        // white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+    }
+}

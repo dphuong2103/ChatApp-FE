@@ -1,0 +1,82 @@
+@import './variables.scss';
+
+.action-bar-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1rem;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+    background-color: white;
+
+    & .action-bar-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+
+        &>textarea {
+            border: none;
+            padding: 0.3rem;
+            resize: none;
+            height: auto;
+            width: 100%;
+            background: none;
+            font-size: $text-sizes-text-regular-s;
+            letter-spacing: $letter-spacing-regular;
+        }
+
+        & .send {
+            &:hover {
+                color: blue;
+            }
+        }
+
+        & .btn-container {
+            display: flex;
+            align-items: end;
+            // height: 100%;
+        }
+
+        .emoji-picker-container {
+            position: absolute;
+
+            &.d-none {
+                display: none;
+            }
+        }
+    }
+
+    & .reply-message-container {
+        width: 100%;
+        padding: 1rem 1rem 0.5rem;
+        border-radius: 10px;
+        background-color: #eaedf0;
+        position: relative;
+        overflow: hidden;
+
+        & .reply-message-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            width: 100%;
+        }
+
+        & .close {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            border: none;
+            background: none;
+            color: grey;
+        }
+
+        &.d-none {
+            display: none;
+        }
+    }
+
+}

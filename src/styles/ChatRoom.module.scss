@@ -1,0 +1,57 @@
+@import "./variables.scss";
+
+.chatroom-container {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    cursor: pointer;
+    color: black;
+    border-radius: 10px;
+    &.active {
+        background-color: #3390ec;
+        color: white;
+    }
+
+    & .photo {
+        width: 3rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+    }
+
+    &:hover:not(.active) {
+        background: #f4f4f5;
+    }
+
+    & .info {
+        overflow: hidden;
+    }
+
+    & .last-message {
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    & .last-message-time {
+        margin-left: auto;
+        display: flex;
+        flex-direction: column;
+        font-size: $text-sizes-text-regular-ss;
+
+        & .number-of-unread-messages {
+            background-color: #c31818;
+            align-self: center;
+            // aspect-ratio: 1;
+            color: white;
+            text-align: center;
+            border-radius: 30px;
+
+            padding: 2px 5px;
+        }
+    }
+
+}

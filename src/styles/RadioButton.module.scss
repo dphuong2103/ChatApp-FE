@@ -1,0 +1,19 @@
+.input {
+    display: none;
+
+    &:checked+.label {
+        background-color: #3c465f;
+        color: white;
+    }
+}
+
+.label {
+    // background-color: #59698d;
+    background-color: lightgray;
+    color: black;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}

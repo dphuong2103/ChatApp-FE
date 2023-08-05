@@ -1,0 +1,90 @@
+.add-group-chat-modal-backdrop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.modal-container {
+    background-color: white;
+    width: min(32rem, 95%);
+    max-height: 40rem;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow-y: scroll;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+
+    & .title-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid lightgray;
+    }
+
+    & .search-container {
+        padding: 0.3rem 1rem;
+    }
+
+    & .group-general-info {
+        padding: 0.3rem 1rem;
+
+        &.d-none {
+            display: none;
+        }
+    }
+
+    & .add-people-container {
+        display: flex;
+        height: 25rem;
+        max-height: 90%;
+        flex-direction: column;
+
+        & .partnerts-container-scrollable {
+            border-right: 1px solid lightgray;
+            height: 100%;
+            overflow-y: scroll;
+
+            & .partners-container {
+                display: flexscrollable;
+                flex-direction: column;
+            }
+        }
+
+        & .selected-people-section {
+            padding: 0.3rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: column;
+
+            max-height: 40%;
+
+            & .container {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+        }
+
+        & .scrollable {
+            height: 100%;
+            overflow-y: scroll;
+        }
+    }
+}
+
+
+.actions-container {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}

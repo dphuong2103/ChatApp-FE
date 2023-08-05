@@ -1,0 +1,31 @@
+@import './global.scss';
+
+.homepage-container {
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+
+    @include notMobile {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+.chat-container {
+    height: 100%;
+    display: flex;
+    position: relative;
+    &.d-none {
+        display: none;
+
+        @include notMobile {
+            display: initial;
+        }
+    }
+
+    @include notMobile {
+        flex: 1;
+    }
+
+}

@@ -1,0 +1,67 @@
+.chat-content-wrapper {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.container-scrollable {
+    overflow-y: scroll;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+
+.btn-to-bottom-container {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    width: 2rem;
+    height: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    &.d-none {
+        display: none;
+    }
+
+
+    & .btn-to-bottom {
+        position: relative;
+        animation: btn-to-bottom;
+        background-color: white;
+        height: 2rem;
+        aspect-ratio: 1;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        width: 2.5rem;
+        height: 2.5rem;
+
+        &:hover {
+            background-color: grey;
+            color: white;
+        }
+    }
+}
+
+@keyframes btn-to-bottom {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.chat-content-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+}

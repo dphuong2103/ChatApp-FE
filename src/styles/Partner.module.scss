@@ -1,0 +1,38 @@
+.user-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 12px;
+
+    &:hover:not(.light) {
+        background-color: #f3f5f6;
+
+    }
+
+    &.light {
+        filter: brightness(85%);
+        color: lightgrey;
+        cursor: initial;
+    }
+
+    & input {
+        border-radius: 50%;
+        appearance: none;
+        background-color: white;
+        height: 1.2rem;
+        width: 1.2rem;
+        padding: 0.3rem;
+        border: 1px solid lightgray;
+        -webkit-appearance: none;
+        outline: none;
+        cursor: pointer;
+
+        &:checked {
+            appearance: auto;
+            clip-path: circle(50% at 50% 50%);
+            background-color: blue;
+        }
+    }
+}

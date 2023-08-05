@@ -1,0 +1,23 @@
+.chat-member-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+
+    & .menu {
+        margin-left: auto;
+        display: none;
+
+    }
+
+    &:hover {
+        background: #f4f4f5;
+        
+        & .menu {
+            display: initial;
+        }
+    }
+
+}

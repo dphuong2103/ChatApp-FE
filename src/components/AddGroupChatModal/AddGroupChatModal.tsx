@@ -11,11 +11,12 @@ import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../help
 import { stringContains } from '../../helper/checkString';
 import { ChatRoomAPI, UserChatRoomAPI } from '../../api';
 import { generateClassName } from '../../utils/generateClassName';
+import { isChatRoomSummary } from '../../helper/checkType';
 
 function AddGroupChatModal({ open, onClose, members, type }: AddGroupChatModalProps) {
     const [searchValue, setSearchValue] = useState('');
     const currentUser = useAppSelector(state => state.auth.user);
-    const { currentChatRoomSummary } = useCurrentChatRoomContext();
+    const { currentChatRoomSummary, handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
     const [partners, setPartners] = useState<TUser[]>([]);
     const { chatRoomSummaries } = useChatRoomSummaryContext();
     const [selectedPartners, setSelectedPartners] = useState<TUser[]>([]);
@@ -97,10 +98,12 @@ function AddGroupChatModal({ open, onClose, members, type }: AddGroupChatModalPr
                 newChatRoom: newChatRoom,
                 userIds: userIds
             }
-            await ChatRoomAPI.addNewChatRoomGroup(newChatRoomAndUserList);
-
+            var chatRoomSummary = (await ChatRoomAPI.addNewChatRoomGroup(newChatRoomAndUserList)).data;
+            if (isChatRoomSummary(chatRoomSummary)) {
+                handleSetCurrentChatRoomSummary(chatRoomSummary, true);
+            }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
@@ -114,7 +117,7 @@ function AddGroupChatModal({ open, onClose, members, type }: AddGroupChatModalPr
             await UserChatRoomAPI.addMembersToChatGroup(newMemberRequest);
 
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 

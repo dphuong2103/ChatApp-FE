@@ -41,7 +41,7 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     const [newChat, setNewChat] = useState<NewChat | null>(null);
     const currentUser = useAppSelector(state => state.auth.user);
 
-    async function handleSetCurrentChatRoomSummary(chatRoomSummary: ChatRoomSummary) {
+    async function handleSetCurrentChatRoomSummary(chatRoomSummary: ChatRoomSummary, newChatRoom?: boolean) {
         let newChatRoomId = chatRoomSummary.chatRoom.id;
         let oldChatRoomId: string | undefined;
         setNewChat(null);
@@ -50,13 +50,15 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             if (oldChatRoomId === newChatRoomId) return prev;
             return { ...chatRoomSummary }
         });
+        setCurrentChatRoomInfo(getChatRoomInfo(chatRoomSummary));
         setShowChatRoom(true);
         if (newChatRoomId === oldChatRoomId) return;
         dispatchMessage({ type: MessagesActionType.DELETEALL })
+        if (newChatRoom) return;
         await firstGetMessagesByChatRoomId(chatRoomSummary.chatRoom.id);
-        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UPDATELATESTMESSAGE, payload: updateChatRoomLastSeenMessagesOnOpenNewChatRoom(chatRoomSummary.chatRoom.id) })
-
+        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen, payload: chatRoomSummary.chatRoom.id })
     }
+
 
     async function firstGetMessagesByChatRoomId(chatRoomId: string) {
         try {
@@ -81,44 +83,19 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         if (message.chatRoomId === currentChatRoomSummary?.chatRoom.id) {
             dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
         }
-        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UPDATELATESTMESSAGE, payload: handleUpdateChatRoomSummary(message) })
-    }
 
-
-    function handleUpdateChatRoomSummary(message: Message) {
-        let updatedChatRoomSummaries = chatRoomSummaries.map(chatRoomSummary => {
-            if (chatRoomSummary.chatRoom.id === message.chatRoomId) {
-                if (!chatRoomSummary.latestMessage) {
-                    chatRoomSummary.latestMessage = message
-                    return chatRoomSummary;
-                }
-                var oldMessageDate = new Date(chatRoomSummary.latestMessage.createdTime);
-                var newMessageDate = new Date(message.createdTime);
-                if (oldMessageDate.getTime() > newMessageDate.getTime()) {
-                    return chatRoomSummary
-                }
-                chatRoomSummary.latestMessage = message;
-                if (message.chatRoomId !== currentChatRoomSummary?.chatRoom.id) {
-                    if (!chatRoomSummary.numberOfUnreadMessages) {
-                        chatRoomSummary.numberOfUnreadMessages = 1;
-                    }
-                    else { chatRoomSummary.numberOfUnreadMessages += 1 };
-                }
-                return chatRoomSummary;
+        dispatchChatRoomSummary({
+            type: ChatRoomSummaryActionType.UpdateChatRoomSMROnReceiveMessage, payload: {
+                message: message,
+                currentChatRoomId: currentChatRoomSummary?.chatRoom.id,
             }
-            return chatRoomSummary
         })
-        return updatedChatRoomSummaries;
     }
 
     function handleNewChatSelect(user: User) {
         const users: User[] = [currentUser!, user];
+        setCurrentChatRoomSummary(null);
         setNewChat({ users });
-        setCurrentChatRoomInfo({
-            name: user.displayName,
-            imgUrl: user.photoUrl,
-            partners: [user]
-        })
         setShowChatRoom(true);
         dispatchMessage({ type: MessagesActionType.DELETEALL })
         setCurrentChatRoomInfo({
@@ -126,16 +103,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             imgUrl: user.photoUrl,
             partners: [user]
         });
-    }
-
-    function updateChatRoomLastSeenMessagesOnOpenNewChatRoom(chatRoomId: string) {
-        let updatedChatRoomSummaries = chatRoomSummaries.map(chatRoomSummary => {
-            if (chatRoomSummary.chatRoom.id === chatRoomId) {
-                chatRoomSummary.numberOfUnreadMessages = undefined;
-            }
-            return chatRoomSummary;
-        })
-        return updatedChatRoomSummaries;
     }
 
     useEffect(() => {
@@ -171,22 +138,14 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
                 receivedMessage(message);
             })
         }
-    }, [currentChatRoomSummary, newChat])
+    }, [currentChatRoomSummary])
 
     useEffect(() => {
         setCurrentChatRoomSummary(prev => {
             const crs = chatRoomSummaries.find(crs => crs.chatRoom.id === prev?.chatRoom.id)
-            if (crs) return { ...crs }
-            else return prev;
+            return crs ? { ...crs } : null
         })
     }, [chatRoomSummaries])
-
-    useEffect(() => {
-        if (currentChatRoomSummary) {
-            setCurrentChatRoomInfo(getChatRoomInfo(currentChatRoomSummary));
-            return;
-        }
-    }, [currentChatRoomSummary])
 
     return (
         <CurrentChatRoomContext.Provider value={{
@@ -199,7 +158,7 @@ type showChatRoomContextProps = {
     showChatRoom: boolean,
     setShowChatRoom: React.Dispatch<React.SetStateAction<boolean>>,
     currentChatRoomSummary: ChatRoomSummary | null,
-    handleSetCurrentChatRoomSummary: (chatRoomSummary: ChatRoomSummary) => void,
+    handleSetCurrentChatRoomSummary: (chatRoomSummary: ChatRoomSummary, newChatRoom?: boolean) => void,
     messages: Message[],
     dispatchMessage: React.Dispatch<MessagesActionAndPayloadType>,
     getMessagesPageByChatRoomId: () => Promise<void>;

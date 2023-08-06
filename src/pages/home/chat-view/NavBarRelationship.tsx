@@ -1,27 +1,52 @@
 import { useEffect, useState } from 'react'
-import { RelationshipStatus, User, UserRelationship } from '../../../types/dataType'
+import { ChatRoomType, NewChatRoomAndUserList, RelationshipStatus, User, UserRelationship } from '../../../types/dataType'
 import { useAppSelector } from '../../../redux/store';
 import { generateClassName } from '../../../utils/generateClassName';
 import styles from '../../../styles/NavBarRelationship.module.scss';
 import { Typography, Button } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { UserRelationshipAPI } from '../../../api';
+import { ChatRoomAPI, UserRelationshipAPI } from '../../../api';
 import { getRelationshipStatus } from '../../../helper/relationshipHelper';
+import { useCurrentChatRoomContext } from '../../../helper/getContext';
 function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProps) {
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
+  const { newChat, handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
   const currentUser = useAppSelector(state => state.auth.user);
 
   useEffect(() => {
     setRelationshipStatus(getRelationshipStatus(relationship));
   }, [relationship])
-  
+
   async function handleSendFriendRequest() {
     if (!currentUser || !targetUser?.id) return;
+    if (newChat) {
+      await handleCreateChatRoom();
+      return;
+    }
     try {
       await UserRelationshipAPI.sendFriendRequest(currentUser.id, targetUser.id);
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async function handleCreateChatRoom() {
+    try {
+      const newChatRoomAndUserList: NewChatRoomAndUserList = {
+        newChatRoom: {
+          chatRoomType: ChatRoomType.ONE,
+          creatorId: currentUser!.id
+        },
+        userIds: [currentUser!.id, targetUser!.id]
+      }
+      var response = await ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList);
+      const newChatRoomSummary = response.data;
+      handleSetCurrentChatRoomSummary(newChatRoomSummary)
+      await UserRelationshipAPI.sendFriendRequest(currentUser!.id, targetUser!.id);
+    } catch (err) {
+      console.error(err);
+    }
+
   }
 
   async function handleCancelFriendRequest() {

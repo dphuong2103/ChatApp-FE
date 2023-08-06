@@ -41,7 +41,7 @@ function Message({ message, onAvatarClick }: MessageProps) {
                 toast.success('Message deleted!');
             } catch (err) {
                 toast.error('Error deleting message, please try again')
-                console.log(err);
+                console.error(err);
             }
         }
         else {

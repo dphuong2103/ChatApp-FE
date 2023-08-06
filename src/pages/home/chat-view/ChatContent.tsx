@@ -64,7 +64,6 @@ function ChatContent() {
   }
 
   function handleAvatarSelect(user: User) {
-    console.log(user);
     if (!currentUser) return;
 
     const relationship = getRelationship(currentUser, user.id, relationships);
@@ -85,7 +84,7 @@ function ChatContent() {
           <ArrowDown />
         </IconButton>
       </div>
-      <UserInfoModal open={openUserInfoModal} onClose={() => setOpenUserInfoModal(false)} relationship={selectedUserWithRelationship?.relationship} user={selectedUserWithRelationship?.user} />
+      <UserInfoModal open={openUserInfoModal} onClose={() => setOpenUserInfoModal(false)} relationship={selectedUserWithRelationship?.relationship} userId={selectedUserWithRelationship?.user.id} />
     </div>
   )
 }

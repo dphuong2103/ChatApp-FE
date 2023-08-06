@@ -54,7 +54,7 @@ function ActionBar() {
         try {
             var response = await ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList);
             const newChatRoomSummary = response.data;
-            handleSetCurrentChatRoomSummary(newChatRoomSummary)
+            handleSetCurrentChatRoomSummary(newChatRoomSummary, true)
             const message: NewMessage = {
                 chatRoomId: newChatRoomSummary.chatRoom.id,
                 messageText: textInput,
@@ -142,9 +142,9 @@ function ActionBar() {
         };
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         setTextInput('')
-    },[newChat, currentChatRoomSummary])
+    }, [newChat, currentChatRoomSummary])
 
     return (
         <form className={styles['action-bar-form']} onSubmit={handleSubmitMessage} ref={formRef}>

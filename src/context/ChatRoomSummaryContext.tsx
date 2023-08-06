@@ -1,5 +1,5 @@
 import { createContext, useEffect, useReducer, useState } from 'react'
-import { ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, UserChatRoom, UserRelationship } from '../types/dataType';
+import { ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, Message, User, UserChatRoom, UserRelationship } from '../types/dataType';
 import { sortChatRoomSummary } from '../helper/filterDuplicateItemInArray';
 import { ChatRoomAPI, UserRelationshipAPI } from '../api';
 import { useHubConnection } from '../helper/getContext';
@@ -27,7 +27,22 @@ type ChatRoomSummaryAction = {
 } | {
     type: ChatRoomSummaryActionType.UpdateChatRoomName,
     payload: ChatRoomIdAndName
+} | {
+    type: ChatRoomSummaryActionType.DeleteAll
+} | {
+    type: ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen,
+    payload: string
+} | {
+    type: ChatRoomSummaryActionType.UpdateChatRoomSMROnReceiveMessage,
+    payload: {
+        message: Message,
+        currentChatRoomId?: string
+    }
+} | {
+    type: ChatRoomSummaryActionType.UpdateUser,
+    payload: User
 }
+
 
 const initState: ChatRoomSummary[] = [];
 
@@ -40,12 +55,50 @@ const reducer = (state: ChatRoomSummary[], action: ChatRoomSummaryAction) => {
                 const values = sortChatRoomSummary([...state, ...action.payload]);
                 return [...values];
             }
-        case ChatRoomSummaryActionType.UPSERT: return [...sortChatRoomSummary(handeUpsertChatRoom(state, action.payload))];
-        case ChatRoomSummaryActionType.UPDATELATESTMESSAGE: return [...sortChatRoomSummary(action.payload)];
-        case ChatRoomSummaryActionType.USERTUSERCHATROOM: return [...handleUpdateUserChatRoom(action.payload, state)];
-        case ChatRoomSummaryActionType.RemoveUserFromGroupChat: return [...handleRemoveUserFromGroupChat(state, action.payload)]
-        case ChatRoomSummaryActionType.AddMembersToChatRoom: return [...handleAddMembersToChatRoom(state, action.payload)]
-        case ChatRoomSummaryActionType.UpdateChatRoomName: return [...handleUpdateChatRoomName(state, action.payload)]
+        case ChatRoomSummaryActionType.UPSERT: {
+            console.log('ChatRoomSummaryActionType.UPSERT')
+            return [...handeUpsertChatRoom(state, action.payload)]
+        };
+        case ChatRoomSummaryActionType.UPDATELATESTMESSAGE: {
+            console.log('ChatRoomSummaryActionType.UPDATELATESTMESSAGE')
+            return [...sortChatRoomSummary(action.payload)]
+        };
+        case ChatRoomSummaryActionType.USERTUSERCHATROOM: {
+            console.log('ChatRoomSummaryActionType.USERTUSERCHATROOM')
+            return [...handleUpdateUserChatRoom(action.payload, state)]
+        };
+        case ChatRoomSummaryActionType.RemoveUserFromGroupChat: {
+            console.log('ChatRoomSummaryActionType.RemoveUserFromGroupChat')
+            return [...handleRemoveUserFromGroupChat(state, action.payload)]
+        }
+        case ChatRoomSummaryActionType.AddMembersToChatRoom: {
+            console.log('ChatRoomSummaryActionType.AddMembersToChatRoom')
+            return [...handleAddMembersToChatRoom(state, action.payload)]
+        }
+        case ChatRoomSummaryActionType.UpdateChatRoomName: {
+            console.log('ChatRoomSummaryActionType.UpdateChatRoomName')
+            return [...handleUpdateChatRoomName(state, action.payload)]
+        }
+
+        case ChatRoomSummaryActionType.DeleteAll: {
+            console.log('ChatRoomSummaryActionType.DeleteAll')
+            return [];
+        }
+        case ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen: {
+            return state.map(crs => {
+                if (crs.chatRoom.id === action.payload) {
+                    crs.numberOfUnreadMessages = undefined;
+                }
+                return { ...crs }
+            });
+        }
+        case ChatRoomSummaryActionType.UpdateChatRoomSMROnReceiveMessage: {
+            return [...sortChatRoomSummary(handleUpdateCRSOnReceiveMessage(state, action.payload.message, action.payload.currentChatRoomId))]
+        }
+        case ChatRoomSummaryActionType.UpdateUser: {
+            return [...handleUpdateUser(state, action.payload)]
+        }
+
     }
 }
 
@@ -64,15 +117,71 @@ function handleRemoveUserFromGroupChat(state: ChatRoomSummary[], request: ChatRo
     })
 }
 
+function handleUpdateUser(state: ChatRoomSummary[], request: User) {
+
+    return state.map((chatRoomSummary) => {
+        const updatedUsers = chatRoomSummary.users.map((user) => {
+            if (user.id === request.id) {
+                return request;
+            } else {
+                return user;
+            }
+        });
+
+        return { ...chatRoomSummary, users: updatedUsers };
+    });
+}
+
 function handleUpdateUserChatRoom(userChatRoom: UserChatRoom, state: ChatRoomSummary[]) {
     state.map(crs => {
         if (crs.chatRoom.id === userChatRoom.chatRoomId) {
             crs.userChatRoom = userChatRoom
-            return {...crs};
+            return { ...crs };
         }
         return crs;
     })
     return state;
+}
+
+
+function handleUpdateCRSOnReceiveMessage(state: ChatRoomSummary[], message: Message, currentChatRoomId?: string) {
+    if (message.chatRoomId === currentChatRoomId) {
+        const updatedChatRoomSummaries = state.map(crs => {
+            if (crs.chatRoom.id === currentChatRoomId) {
+                crs.latestMessage = message;
+                return { ...crs };
+            }
+            return crs;
+        })
+        return updatedChatRoomSummaries;
+    }
+
+    const updatedChatRoomSummaries = state.map(crs => {
+        if (crs.chatRoom.id !== message.chatRoomId) return crs;
+
+        if (!crs.latestMessage) {
+            crs.latestMessage = message;
+            crs.numberOfUnreadMessages = 1;
+            return { ...crs };
+        }
+
+        var oldMessageDate = new Date(crs.latestMessage.createdTime);
+        var newMessageDate = new Date(message.createdTime);
+        if (oldMessageDate.getTime() > newMessageDate.getTime()) {
+            return crs
+        }
+        crs.latestMessage = message;
+        if (message.chatRoomId) {
+            if (!crs.numberOfUnreadMessages) {
+                crs.numberOfUnreadMessages = 1;
+            }
+            else { crs.numberOfUnreadMessages += 1 };
+        }
+
+        return { ...crs };
+    })
+
+    return updatedChatRoomSummaries;
 }
 
 function handleUpdateChatRoomName(state: ChatRoomSummary[], request: ChatRoomIdAndName) {
@@ -81,11 +190,10 @@ function handleUpdateChatRoomName(state: ChatRoomSummary[], request: ChatRoomIdA
             crs.chatRoom.name = request.name;
             return { ...crs };
         }
-        return {...crs};
+        return crs;
     })]
     return newState;
 }
-
 
 function handeUpsertChatRoom(state: ChatRoomSummary[], payload: ChatRoomSummary) {
     let chatRoomExists = false;
@@ -98,7 +206,7 @@ function handeUpsertChatRoom(state: ChatRoomSummary[], payload: ChatRoomSummary)
     })
 
     if (!chatRoomExists) {
-        state.push(payload);
+        state.unshift(payload)
     }
 
     return state;
@@ -115,43 +223,52 @@ function handleAddMembersToChatRoom(state: ChatRoomSummary[], request: ChatRoomI
 
 export const ChatRoomSummaryContextProvider = createContext({} as ChatRoomSummaryContextValue);
 
-
 function ChatRoomSummaryContext({ children }: ContextChildren) {
     const [chatRoomSummaries, dispatchChatRoomSummary] = useReducer(reducer, initState);
     const [relationships, setRelationships] = useState<UserRelationship[]>([]);
     const { connection } = useHubConnection();
-
+    const authState = store.getState().auth;
+    console.log(chatRoomSummaries);
     useEffect(() => {
         const abortController = new AbortController();
-        getChatRoomSummaries();
-        getUserRelationships();
-        async function getChatRoomSummaries() {
-            try {
-                const chatRoomSummariesResponse = await ChatRoomAPI.getUserChatRooms(abortController);
-                if (chatRoomSummariesResponse != null && chatRoomSummariesResponse.data.length > 0) {
-                    console.log(chatRoomSummariesResponse.data);
-                    dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.FIRSTGET, payload: chatRoomSummariesResponse.data })
+        if (authState.user?.id) {
+            getChatRoomSummaries();
+            getUserRelationships();
+            async function getChatRoomSummaries() {
+                try {
+                    const chatRoomSummariesResponse = await ChatRoomAPI.getUserChatRooms(abortController);
+                    if (chatRoomSummariesResponse != null && chatRoomSummariesResponse.data.length > 0) {
+                        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.FIRSTGET, payload: chatRoomSummariesResponse.data })
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
-            } catch (err) {
-                console.error(err);
-            }
-        };
+            };
 
-        async function getUserRelationships() {
-            try {
-                const userRelationships = await UserRelationshipAPI.getUserRelationship(abortController);
-                if (userRelationships != null) {
-                    setRelationships(userRelationships.data);
+            async function getUserRelationships() {
+                try {
+                    const userRelationships = await UserRelationshipAPI.getUserRelationship(abortController);
+                    if (userRelationships != null) {
+                        setRelationships(userRelationships.data);
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
-            } catch (err) {
-                console.error(err);
             }
         }
+
         return () => {
             abortController.abort();
         }
 
-    }, [])
+    }, [authState.user?.id])
+
+    useEffect(() => {
+        if (!authState.isLoggedIn) {
+
+            dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.DeleteAll })
+        }
+    }, [authState.isLoggedIn])
 
     useEffect(() => {
         if (connection) {

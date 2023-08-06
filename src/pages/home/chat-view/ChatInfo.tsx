@@ -38,7 +38,7 @@ function ChatInfo() {
       dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.USERTUSERCHATROOM, payload: userChatRoomResponse.data });
     }
     catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

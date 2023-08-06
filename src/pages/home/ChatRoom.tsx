@@ -14,7 +14,6 @@ function ChatRoom({ chatRoomSummary, onClick, isSelected }: ChatRoomProps) {
     const lastMesesage = `${senderName ?? ''}: ${chatRoomSummary.latestMessage?.messageText}`;
     
     useEffect(() => {
-        console.log(chatRoomSummary.chatRoom.name)
         setChatNameAndPhoto(getChatRoomInfo(chatRoomSummary));
     }, [chatRoomSummary]);
 

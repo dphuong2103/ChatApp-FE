@@ -1,23 +1,41 @@
 import { Button, IconButton, Modal, Typography } from '@mui/material';
 import styles from '../styles/UserInfoModal.module.scss';
 import Avatar from './Avatar';
-import { RelationshipStatus, User, UserRelationship } from '../types/dataType';
+import { ChatRoomSummaryActionType, RelationshipStatus, User, UserRelationship } from '../types/dataType';
 import { generateClassName } from '../utils/generateClassName';
 import { useEffect, useState } from 'react';
 import { getRelationshipStatus } from '../helper/relationshipHelper';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { UserRelationshipAPI } from '../api';
+import { UserAPI, UserRelationshipAPI } from '../api';
 import { useAppSelector } from '../redux/store';
 import { X } from 'phosphor-react';
 import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../helper/getContext';
 import { getChatRoomAndUserListByUserIdFromChatRoomSummaries } from '../helper/chatRoomHelper';
 import { formatDateFromString } from '../helper/dateTime';
 
-function UserInfoModal({ open, user, relationship, onClose }: UserInfoModalProps) {
+function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalProps) {
     const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null)
-    const { chatRoomSummaries } = useChatRoomSummaryContext();
+    const { chatRoomSummaries, dispatchChatRoomSummary } = useChatRoomSummaryContext();
     const { handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
     const currentUser = useAppSelector(state => state.auth.user);
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        getUser();
+
+        async function getUser() {
+            if (userId) {
+                try {
+                    var user = (await UserAPI.getUserById(userId)).data;
+                    setUser(user)
+                    dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUser, payload: user })
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }, [userId])
+
     useEffect(() => {
         setRelationshipStatus(getRelationshipStatus(relationship))
     }, [relationship])
@@ -131,7 +149,7 @@ export default UserInfoModal;
 
 type UserInfoModalProps = {
     open: boolean,
-    user?: User,
+    userId?: string,
     relationship?: UserRelationship,
     onClose: () => void,
 }

@@ -47,10 +47,8 @@ function ContactTab() {
     setSearchInput(e.target.value)
   }
   function handleSearchInputFocusIn() {
-    console.log('123')
   }
   function handleOnSearchInputFocusOut() {
-    console.log('123')
   }
   function handleBackClick() {
     navigate('/home/chatlist')

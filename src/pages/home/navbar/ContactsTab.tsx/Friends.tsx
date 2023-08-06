@@ -29,7 +29,6 @@ function Friends() {
     }, [searchInput, friends])
 
     async function handleUserClick(friend: TFriend) {
-        console.log(friend.chatRoomSummary?.chatRoom.id);
         if (friend.chatRoomSummary) {
             handleSetCurrentChatRoomSummary(friend.chatRoomSummary);
         }

@@ -6,7 +6,6 @@ export function getContactAndChatRooms(relationships: UserRelationship[], chatRo
     if (!currentUserId) return [];
     let contacts: Friend[] = [];
     let friendRelationships = relationships.filter(relationship => relationship.relationshipType === 'E_FRIEND' && relationship.status === 'E_ACCEPTED');
-    console.log(friendRelationships);
     if (friendRelationships.length < 1) return [];
     for (var relationship of friendRelationships) {
         let targetUser = relationship.initiatorUserId === currentUserId ? relationship.targetUser : relationship.initiatorUser;

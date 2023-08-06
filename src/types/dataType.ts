@@ -149,8 +149,9 @@ export enum ConnectionFunction {
 export enum ChatRoomSummaryConnectionFunction {
   RemoveUserFromGroupChat = 'removeuserfromgroupchat',
   AddMembersToChatRoom = 'addmemberstochatroom',
-  UpdateChatRoomName = 'updatechatroomname'
+  UpdateChatRoomName = 'updatechatroomname',
 }
+
 export enum ChatRoomSummaryActionType {
   FIRSTGET,
   UPSERT,
@@ -158,7 +159,11 @@ export enum ChatRoomSummaryActionType {
   USERTUSERCHATROOM,
   RemoveUserFromGroupChat,
   AddMembersToChatRoom,
-  UpdateChatRoomName
+  UpdateChatRoomName,
+  DeleteAll,
+  UpdateUnReadMessageCountOnChatRoomOpen,
+  UpdateChatRoomSMROnReceiveMessage,
+  UpdateUser
 }
 
 export type ChatRoomIdAndUsers = {

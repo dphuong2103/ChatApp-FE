@@ -30,10 +30,12 @@ function NavBar() {
     }
 
     useEffect(() => {
-        if (newChat) {
+        if (newChat && currentChatRoomInfo) {
             setRelationship(null);
-            setTargetUser(newChat.users[0])
+            setTargetUser(currentChatRoomInfo.partners[0])
+            return;
         }
+
         if (currentChatRoomSummary) {
             currentChatRoomSummary.users.forEach(user => {
                 if (user.id !== currentUser?.id) {
@@ -41,8 +43,8 @@ function NavBar() {
                 }
             })
         }
-    }, [currentChatRoomSummary, newChat]);
-
+    }, [currentChatRoomSummary, currentChatRoomInfo, newChat]);
+    
     useEffect(() => {
         if (relationships.length === 0) {
             setRelationship(null);
@@ -83,7 +85,7 @@ function NavBar() {
             {
                 (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE' || !!newChat) && <NavBarRelationship relationship={relationship} targetUser={targetUser} />
             }
-            <UserInfoModal open={openUserInfoModal} user={targetUser ? targetUser : undefined} relationship={relationship ? relationship : undefined} onClose={() => setOpenUserInfoModal(false)} />
+            <UserInfoModal open={openUserInfoModal} userId={targetUser ? targetUser.id : undefined} relationship={relationship ? relationship : undefined} onClose={() => setOpenUserInfoModal(false)} />
         </header >
     )
 }

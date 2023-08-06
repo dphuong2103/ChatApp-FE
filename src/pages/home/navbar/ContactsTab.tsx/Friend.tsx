@@ -8,7 +8,7 @@ function Friend({ friend, onClick }: ContactProps) {
     async function handleUserClick() {
         onClick(friend);
     }
-    return <div className={styles['contact-container']} onClick={handleUserClick}>
+    return <div className={styles['friend-container']} onClick={handleUserClick}>
         <Avatar name={friend.user.displayName} imgUrl={friend.user.photoUrl} />
         <Typography variant='body1' fontWeight={500}>{friend.user.displayName}</Typography>
     </div>

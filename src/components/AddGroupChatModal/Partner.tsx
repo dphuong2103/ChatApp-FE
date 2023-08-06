@@ -5,7 +5,7 @@ import { Typography } from '@mui/material';
 import { generateClassName } from '../../utils/generateClassName';
 function Partner({ partner, checked, onClick, isMember }: PartnerProps) {
   return <div className={generateClassName(styles, ['user-container', ...isMember ? ['light'] : []])} onClick={isMember ? undefined : onClick}>
-    <input type='checkbox' checked={checked || isMember} readOnly />
+    <input type='checkbox' checked={checked || isMember || false} readOnly />
     <Avatar name={partner.displayName} imgUrl={partner.photoUrl} />
     <Typography variant='body1'>{partner.displayName}</Typography>
     {

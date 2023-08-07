@@ -165,8 +165,7 @@ export default function Call({ children }: ContextChildren) {
 
     useEffect(() => {
         if (callStatus.onCall || callStatus.receivingCall) {
-            connection?.on(ConnectionFunction.LeavedCall, (userId: string) => {
-                console.log(userId, 'leave called');
+            connection?.on(ConnectionFunction.LeavedCall, (_userId: string) => {
                 if (callChatRoomAndUserList?.chatRoom.chatRoomType === ChatRoomType.ONE) {
                     handleEndCall();
                     setCallChatRoomAndUserList(null);

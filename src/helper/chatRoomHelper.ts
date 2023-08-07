@@ -1,10 +1,11 @@
 import store from '../redux/store';
-import { ChatRoomInfo, ChatRoomSummary, ChatRoomType, User } from '../types/dataType';
+import { ChatRoomInfo, ChatRoomSummary, ChatRoomType, RelationshipStatus, User, UserRelationship } from '../types/dataType';
 import { stringContains } from './checkString';
 import { isChatRoomSummary, isUser } from './checkType';
+import { getRelationship, getRelationshipStatus } from './relationshipHelper';
 
 
-export function getChatRoomInfo(chatRoomSummary: ChatRoomSummary): ChatRoomInfo {
+export function getChatRoomInfo(chatRoomSummary: ChatRoomSummary, relationships?: UserRelationship[]): ChatRoomInfo {
     const useSelector = store.getState();
     const currentUserId = useSelector.auth.user?.id;
     let name = '';
@@ -30,11 +31,22 @@ export function getChatRoomInfo(chatRoomSummary: ChatRoomSummary): ChatRoomInfo 
     }
 
     const partners = chatRoomSummary.users.filter(u => u.id !== currentUserId);
+    let relationship: UserRelationship | undefined;
+    let relationshipStatus: RelationshipStatus | undefined;
+    if (chatRoomSummary.chatRoom.chatRoomType === "ONE" && relationships) {
+        relationship = getRelationship(currentUserId!, partners[0].id, relationships) ?? undefined;
+    }
+    if (relationship) {
+        relationshipStatus = getRelationshipStatus(relationship);
+    }
+
 
     return {
         name,
         imgUrl,
-        partners: partners
+        partners: partners,
+        relationship: relationship,
+        relationshipStatus: relationshipStatus
     }
 }
 

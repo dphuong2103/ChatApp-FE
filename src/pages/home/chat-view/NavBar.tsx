@@ -1,22 +1,16 @@
 import { IconButton, Typography } from '@mui/material'
 import { ArrowLeft, DotsThreeVertical, Phone, VideoCamera } from 'phosphor-react'
 import styles from '../../../styles/ChatNavBar.module.scss'
-import { useCallContext, useChatContext, useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../../helper/getContext'
-import { useEffect, useState } from 'react';
+import { useCallContext, useChatContext, useCurrentChatRoomContext } from '../../../helper/getContext'
+import { useState } from 'react';
 import Avatar from '../../../components/Avatar';
-import { CallType, User, UserRelationship } from '../../../types/dataType';
-import { useAppSelector } from '../../../redux/store';
-import { getRelationship } from '../../../helper/relationshipHelper';
+import { CallType } from '../../../types/dataType';
 import NavBarRelationship from './NavBarRelationship';
 import UserInfoModal from '../../../components/UserInfoModal';
 
 function NavBar() {
-    const { setShowChatRoom, currentChatRoomSummary, currentChatRoomInfo, newChat } = useCurrentChatRoomContext();
-    const { relationships } = useChatRoomSummaryContext();
-    const [relationship, setRelationship] = useState<UserRelationship | null>(null);
-    const [targetUser, setTargetUser] = useState<User | null>(null);
+    const { setShowChatRoom, currentChatRoomSummary, currentChatRoomInfo, newChat, } = useCurrentChatRoomContext();
     const { handleCall } = useCallContext();
-    const currentUser = useAppSelector(state => state.auth.user);
     const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
     const { setShowChatInfo } = useChatContext();
     function handleBackClick() {
@@ -28,36 +22,6 @@ function NavBar() {
             setOpenUserInfoModal(true)
         }
     }
-
-    useEffect(() => {
-        if (newChat && currentChatRoomInfo) {
-            setRelationship(null);
-            setTargetUser(currentChatRoomInfo.partners[0])
-            return;
-        }
-
-        if (currentChatRoomSummary) {
-            currentChatRoomSummary.users.forEach(user => {
-                if (user.id !== currentUser?.id) {
-                    setTargetUser(user);
-                }
-            })
-        }
-    }, [currentChatRoomSummary, currentChatRoomInfo, newChat]);
-    
-    useEffect(() => {
-        if (relationships.length === 0) {
-            setRelationship(null);
-            return;
-        }
-        if (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE' && currentUser) {
-            const chatWithUser = currentChatRoomSummary.users.find(u => u.id !== currentUser.id);
-            if (chatWithUser) {
-                const relationship = getRelationship(currentUser.id, chatWithUser.id, relationships);
-                setRelationship(relationship);
-            }
-        }
-    }, [currentChatRoomSummary, relationships, targetUser])
 
     return (
         <header className={styles['chat-navbar-container']}>
@@ -83,9 +47,14 @@ function NavBar() {
                 </IconButton>
             </div>
             {
-                (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE' || !!newChat) && <NavBarRelationship relationship={relationship} targetUser={targetUser} />
+                (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE' || !!newChat) &&
+                <NavBarRelationship relationship={currentChatRoomInfo?.relationship ?? null} targetUser={currentChatRoomInfo?.partners[0] ?? null} />
             }
-            <UserInfoModal open={openUserInfoModal} userId={targetUser ? targetUser.id : undefined} relationship={relationship ? relationship : undefined} onClose={() => setOpenUserInfoModal(false)} />
+            <UserInfoModal
+                open={openUserInfoModal}
+                userId={currentChatRoomInfo?.partners[0]?.id}
+                relationship={currentChatRoomInfo?.relationship}
+                onClose={() => setOpenUserInfoModal(false)} />
         </header >
     )
 }

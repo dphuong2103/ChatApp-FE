@@ -36,7 +36,7 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     const [currentChatRoomSummary, setCurrentChatRoomSummary] = useState<ChatRoomSummary | null>(null);
     const [messages, dispatchMessage] = useReducer(messageReducer, []);
     const { connection } = useHubConnection();
-    const { dispatchChatRoomSummary, chatRoomSummaries } = useChatRoomSummaryContext();
+    const { dispatchChatRoomSummary, chatRoomSummaries, relationships } = useChatRoomSummaryContext();
     const [currentChatRoomInfo, setCurrentChatRoomInfo] = useState<ChatRoomInfo | null>(null);
     const [newChat, setNewChat] = useState<NewChat | null>(null);
     const currentUser = useAppSelector(state => state.auth.user);
@@ -50,7 +50,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             if (oldChatRoomId === newChatRoomId) return prev;
             return { ...chatRoomSummary }
         });
-        setCurrentChatRoomInfo(getChatRoomInfo(chatRoomSummary));
         setShowChatRoom(true);
         if (newChatRoomId === oldChatRoomId) return;
         dispatchMessage({ type: MessagesActionType.DELETEALL })
@@ -101,9 +100,20 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         setCurrentChatRoomInfo({
             name: user.displayName,
             imgUrl: user.photoUrl,
-            partners: [user]
+            partners: [user],
         });
     }
+
+    useEffect(() => {
+        console.log(chatRoomSummaries);
+        handleSetChatRoomInfo();
+        function handleSetChatRoomInfo() {
+            if (!newChat && chatRoomSummaries.length > 0 && currentChatRoomSummary) {
+                setCurrentChatRoomInfo(getChatRoomInfo(currentChatRoomSummary, relationships));
+            }
+        }
+    }, [chatRoomSummaries, currentChatRoomSummary, relationships, newChat])
+
 
     useEffect(() => {
         updateLastMessageRead();

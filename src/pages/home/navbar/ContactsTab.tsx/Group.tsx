@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getChatRoomInfo } from '../../../../helper/chatRoomHelper';
 import Typography from '@mui/material/Typography/Typography';
 
-function Group({ chatRoomSummary }: GroupProps) {
+function Group({ chatRoomSummary, onClick }: GroupProps) {
     const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoomInfo | null>(null);
 
     useEffect(() => {
@@ -14,7 +14,7 @@ function Group({ chatRoomSummary }: GroupProps) {
         }
     }, [chatRoomSummary])
     return (
-        <div className={styles['group-container']}>
+        <div className={styles['group-container']} onClick={onClick}>
             <Avatar name={chatRoomInfo?.name} imgUrl={chatRoomInfo?.imgUrl} />
             <Typography variant='body1' fontWeight={500}>{chatRoomInfo?.name}</Typography>
         </div>
@@ -24,5 +24,6 @@ function Group({ chatRoomSummary }: GroupProps) {
 export default Group
 
 type GroupProps = {
-    chatRoomSummary: ChatRoomSummary
+    chatRoomSummary: ChatRoomSummary,
+    onClick: () => void
 }

@@ -59,6 +59,8 @@ export type ChatRoomInfo = {
   name: string;
   imgUrl?: string | null;
   partners: User[];
+  relationship?: UserRelationship,
+  relationshipStatus?: RelationshipStatus
 }
 
 export type LoginInUser = SignInUser;

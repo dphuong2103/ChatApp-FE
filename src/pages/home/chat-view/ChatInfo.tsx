@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import ChatMembers from './ChatMembers';
 import UpdateChatRoomNameModal from './UpdateChangeRoomNameModal';
+import UserInfoModal from '../../../components/UserInfoModal';
 
 function ChatInfo() {
   const { currentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
@@ -25,7 +26,7 @@ function ChatInfo() {
   const [openAddPeopleToGroup, setOpenAddPeopleToGroup] = useState(false);
   const [showChatMembers, setShowChatMembers] = useState(false);
   const [openUpdateChatNameModal, setOpenUpdateChatNameModal] = useState(false);
-
+  const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
   async function handleClickMute() {
     if (!currentChatRoomSummary) return;
 
@@ -55,6 +56,12 @@ function ChatInfo() {
     }
   }
 
+  function handleClickAvatar() {
+    if (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE') {
+      setOpenUserInfoModal(true)
+    }
+  }
+
   useEffect(() => {
     setShowChatMembers(false);
   }, [currentChatRoomSummary?.chatRoom.id])
@@ -71,9 +78,14 @@ function ChatInfo() {
         showChatMembers ? <ChatMembers users={currentChatRoomSummary?.users ?? []} /> : <div className={styles['chat-info']}>
 
           <div className={styles['avatar-container']}>
-            <Avatar imgUrl={currentChatRoomInfo?.imgUrl} name={currentChatRoomInfo?.name} size={5} />
+            <Avatar imgUrl={currentChatRoomInfo?.imgUrl} name={currentChatRoomInfo?.name} size={5} onClick={handleClickAvatar} />
           </div>
-
+          <UserInfoModal
+            open={openUserInfoModal}
+            userId={currentChatRoomInfo?.partners[0] ? currentChatRoomInfo?.partners[0].id : undefined}
+            relationship={currentChatRoomInfo?.relationship ? currentChatRoomInfo?.relationship : undefined}
+            onClose={() => setOpenUserInfoModal(false)}
+          />
           <div className={styles['title-container']}>
             <span>{currentChatRoomInfo?.name}</span>
             {

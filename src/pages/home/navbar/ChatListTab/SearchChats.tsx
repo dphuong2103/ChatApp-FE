@@ -39,7 +39,7 @@ function SearchChats() {
     }
 
     return () => { setSearchResult([]), abortController.abort() }
-  }, [searchInputDebounce])
+  }, [searchInputDebounce, chatRoomSummaries])
 
   async function handleSearchedChatClick(searchedResult: ChatRoomSummary | User) {
     if (isUser(searchedResult)) {

@@ -228,7 +228,6 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
     const [relationships, setRelationships] = useState<UserRelationship[]>([]);
     const { connection } = useHubConnection();
     const authState = store.getState().auth;
-    console.log(chatRoomSummaries);
     useEffect(() => {
         const abortController = new AbortController();
         if (authState.user?.id) {

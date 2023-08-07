@@ -1,8 +1,12 @@
 import { format } from 'date-fns';
 export const dateFormat = 'dd/MM/yyyy';
-export function latestMessageTime(date: Date) {
+export function latestMessageTime(request: Date) {
+    let date = request.toString();
+    if (request.toString().charAt(request.toString().length - 1).toLowerCase() !== 'z') {
+        date = `${request.toString()}Z`;
+    }
     const today = new Date();
-    const messageDate = new Date(date);
+    const messageDate = new Date(`${date}`);
     const todayString = today.toDateString();
     const messageDateString = messageDate.toDateString();
     const dateFormat = 'dd/MM';
@@ -13,9 +17,13 @@ export function latestMessageTime(date: Date) {
     else return format(messageDate, dateFormat);
 }
 
-export function messageTime(date: Date) {
+export function messageTime(request: Date) {
+    let date = request.toString();
+    if (request.toString().charAt(request.toString().length - 1).toLowerCase() !== 'z') {
+        date = `${request.toString()}Z`;
+    }
     const today = new Date();
-    const messageDate = new Date(date);
+    const messageDate = new Date(`${date}`);
     const todayString = today.toDateString();
     const messageDateString = messageDate.toDateString();
     const dateFormat = 'dd/MM HH:mm';

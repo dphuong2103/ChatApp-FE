@@ -30,7 +30,6 @@ function ChatMembers({ users }: ChatMembersProps) {
     }
 
     async function handleRemoveFromChat() {
-        console.log(selectedUser);
         if (!selectedUser || !currentChatRoomSummary) return;
         try {
             const request: RemoveFromGroupChat = {

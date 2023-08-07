@@ -105,7 +105,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     }
 
     useEffect(() => {
-        console.log(chatRoomSummaries);
         handleSetChatRoomInfo();
         function handleSetChatRoomInfo() {
             if (!newChat && chatRoomSummaries.length > 0 && currentChatRoomSummary) {
@@ -127,7 +126,7 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
                     await UserChatRoomAPI.updateUserChatRoomLastMessageRead(updateUserChatRoom);
                 }
                 catch (err) {
-                    console.error('err', err);
+                    console.error(err);
                 }
             }
         }

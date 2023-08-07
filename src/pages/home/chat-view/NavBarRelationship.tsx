@@ -18,7 +18,6 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
   }, [relationship])
 
   async function handleSendFriendRequest() {
-    console.log(newChat, targetUser?.id)
     if (!currentUser || !targetUser?.id) return;
     if (newChat) {
       await handleCreateChatRoom();
@@ -32,7 +31,6 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
   }
 
   async function handleCreateChatRoom() {
-    console.log('click')
     try {
       const newChatRoomAndUserList: NewChatRoomAndUserList = {
         newChatRoom: {

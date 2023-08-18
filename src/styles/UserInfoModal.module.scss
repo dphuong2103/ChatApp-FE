@@ -80,12 +80,27 @@
     font-size: 1rem;
 }
 
+.personal-info-wrapper {
+    position: relative;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: 8px;
+        width: 100%;
+        background-color: #eef0f1;
+    }
+}
+
 .personal-info-container {
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
     overflow: hidden;
+
     & .personal-info {
         display: flex;
         flex-direction: column;

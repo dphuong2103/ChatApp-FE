@@ -7,7 +7,7 @@ import { messageTime } from '../../../helper/dateTime';
 import Avatar from '../../../components/Avatar';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import MessageActionMenu from './MessageActionMenu';
 import { MessageAPI } from '../../../api';
@@ -52,6 +52,8 @@ function Message({ message, onAvatarClick }: MessageProps) {
         }
     }
 
+    const repliedMessageText = useMemo(() => truncateMessageName(message), [message.replyToMessage?.messageText])
+
     return (
         <div className={generateClassName(styles, ['message-container', ...message.senderId === currentUserId ? ['right'] : []])}>
             <div className={generateClassName(styles, ['message-card', ...message.senderId === currentUserId ? ['right'] : []])}>
@@ -62,11 +64,11 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     <DownloadFileMessage message={message} />
                     <UploadFileMessage message={message} />
                     <CancelledFileMessage message={message} />
-                    <div className={generateClassName(styles, ['reply-message-container', ...message.replyToMessage ? [] : ['d-none']])}>
+                    <div className={generateClassName(styles, ['replied-message-container', ...message.replyToMessage ? [] : ['d-none']])}>
                         <Typography component='span' variant='body2' fontWeight={500}>{message.replyToMessage?.sender.displayName}</Typography>
                         {
                             message.replyToMessage?.type === 'Files' && message.replyToMessage.fileName ? <FileIcon extension={message.replyToMessage.fileName.split('.').pop() ?? ''} style={{ width: '2.5rem', height: '2.5rem' }} /> :
-                                <div className={styles['reply-message']}>{message.replyToMessage?.messageText}</div>
+                                <div className={styles['replied-message']}>{repliedMessageText}</div>
                         }
                     </div>
                     <Typography color='black' >{message.messageText}</Typography>
@@ -92,4 +94,8 @@ export default Message
 type MessageProps = {
     message: TypeMessage,
     onAvatarClick?: () => void
+}
+
+function truncateMessageName(message: TypeMessage) {
+    return (message.replyToMessage?.messageText && message.replyToMessage?.messageText?.length >= 100) ? `${message.replyToMessage?.messageText.substring(0, 100)}...` : message.replyToMessage?.messageText;
 }

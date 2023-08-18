@@ -1,10 +1,9 @@
-import { Button, IconButton, Modal, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Modal, Typography } from '@mui/material';
 import styles from '../styles/UserInfoModal.module.scss';
 import Avatar from './Avatar';
-import { ChatRoomSummaryActionType, RelationshipStatus, User, UserRelationship } from '../types/dataType';
+import { ChatRoomSummaryActionType, User, UserRelationship } from '../types/dataType';
 import { generateClassName } from '../utils/generateClassName';
 import { useEffect, useState } from 'react';
-import { getRelationshipStatus } from '../helper/relationshipHelper';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { UserAPI, UserRelationshipAPI } from '../api';
 import { useAppSelector } from '../redux/store';
@@ -12,14 +11,14 @@ import { X } from 'phosphor-react';
 import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../helper/getContext';
 import { getChatRoomAndUserListByUserIdFromChatRoomSummaries } from '../helper/chatRoomHelper';
 import { formatDateFromString } from '../helper/dateTime';
-
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import { toast } from 'react-toastify';
 function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalProps) {
-    const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null)
     const { chatRoomSummaries, dispatchChatRoomSummary } = useChatRoomSummaryContext();
-    const { handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
+    const { handleSetCurrentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
     const currentUser = useAppSelector(state => state.auth.user);
     const [user, setUser] = useState<User | null>(null);
-
+    const [openDeleteFriendDialog, setOpenDeleteFriendDialog] = useState(false);
     useEffect(() => {
         getUser();
 
@@ -36,9 +35,6 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
         }
     }, [userId])
 
-    useEffect(() => {
-        setRelationshipStatus(getRelationshipStatus(relationship))
-    }, [relationship])
 
     async function handleSendFriendRequest() {
         if (!currentUser || !user!.id) return;
@@ -67,7 +63,6 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
         }
     }
 
-
     function handleSendMessageClick() {
         const chatRoomAndUserList = getChatRoomAndUserListByUserIdFromChatRoomSummaries(user!.id, chatRoomSummaries);
         if (!chatRoomAndUserList) {
@@ -78,19 +73,31 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
         onClose();
     }
 
+    async function handleDeleteFriend() {
+        if (!currentChatRoomInfo?.relationship) return;
+        try {
+            await UserRelationshipAPI.cancelFriendRequest(currentChatRoomInfo.relationship.id);
+            setOpenDeleteFriendDialog(false);
+            toast.info('Friend deleted successfully');
+        } catch (err) {
+            toast.error('Cannot delete friend, please try again later!');
+            console.log(err)
+        }
+    }
+
     return <Modal open={open} className={styles['user-info-modal-backdrop']} onClose={onClose}>
         <div className={styles['container']}>
-            <div className={styles['title-container']}>
+            <section className={styles['title-container']}>
                 <Typography variant='h6' >Account information</Typography>
                 <IconButton onClick={() => onClose()}>
                     <X />
                 </IconButton>
-            </div>
+            </section>
             <section className={styles['general-info-container']}>
                 <Avatar name={user?.displayName} imgUrl={user?.photoUrl} size={5} />
                 <Typography variant='h6'>{user?.displayName}</Typography>
                 {
-                    relationshipStatus === 'RequestReceived'
+                    currentChatRoomInfo?.relationshipStatus === 'RequestReceived'
                     && <div className={styles['actions-request-received-container']}>
                         <Button variant="outlined" color="error" onClick={handleCancelFriendRequest} fullWidth>
                             Decline
@@ -102,14 +109,14 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
                 }
                 <div className={styles['friendship-actions']}>
                     {
-                        relationshipStatus === 'NotFriend' && <button onClick={handleSendFriendRequest} className={generateClassName(styles, ['btn'])}>
+                        currentChatRoomInfo?.relationshipStatus === 'NotFriend' && <button onClick={handleSendFriendRequest} className={generateClassName(styles, ['btn'])}>
                             <PersonAddIcon />
                             Add friend
                         </button>
                     }
 
                     {
-                        relationshipStatus === 'RequestSent' && true && <>
+                        currentChatRoomInfo?.relationshipStatus === 'RequestSent' && true && <>
                             <button onClick={handleCancelFriendRequest} className={generateClassName(styles, ['btn'])}>
                                 Cancel friend request
                             </button>
@@ -122,28 +129,57 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
                 </div>
             </section>
 
-            <section className={styles['personal-info-container']}>
-                <span className={styles.title}>
-                    Personal information
-                </span>
-                <div className={styles['personal-info']}>
-                    <div className={styles['info-container']}>
-                        <div className={styles['info-title']}>Gender: </div>
-                        <div>Male</div>
-                    </div>
-                    <div className={styles['info-container']}>
-                        <div className={styles['info-title']}>Date of birth: </div>
-                        <div>{formatDateFromString(user?.dateOfBirth)}</div>
-                    </div>
-                    <div className={styles['info-container']}>
-                        <div className={styles['info-title']}>Bio: </div>
-                        <span className={generateClassName(styles, ['bio'])}>{user?.bio}</span>
+            <section className={styles['personal-info-wrapper']}>
+                <div className={styles['personal-info-container']}>
+                    <span className={styles.title}>
+                        Personal information
+                    </span>
+                    <div className={styles['personal-info']}>
+                        <div className={styles['info-container']}>
+                            <div className={styles['info-title']}>Gender: </div>
+                            <div>Male</div>
+                        </div>
+                        <div className={styles['info-container']}>
+                            <div className={styles['info-title']}>Date of birth: </div>
+                            <div>{formatDateFromString(user?.dateOfBirth)}</div>
+                        </div>
+                        <div className={styles['info-container']}>
+                            <div className={styles['info-title']}>Bio: </div>
+                            <span className={generateClassName(styles, ['bio'])}>{user?.bio}</span>
+                        </div>
                     </div>
                 </div>
-            </section>
 
+            </section>
+            <MenuList style={{ paddingTop: '1rem' }}>
+                {
+                    currentChatRoomInfo?.relationshipStatus === 'Friend' && <MenuItem style={{ borderRadius: '5px', color: 'red' }} onClick={() => setOpenDeleteFriendDialog(true)}>
+                        <ListItemIcon >
+                            <PersonOffIcon fontSize="small" style={{ color: 'red' }} />
+                        </ListItemIcon>
+                        <ListItemText>Remove friend</ListItemText>
+                    </MenuItem>
+                }
+
+            </MenuList>
+            <Dialog
+                open={openDeleteFriendDialog}
+                onClose={() => setOpenDeleteFriendDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Are you sure you want to delete this friend?"}
+                </DialogTitle>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteFriendDialog(false)}>Cancel</Button>
+                    <Button onClick={handleDeleteFriend} autoFocus color='error' >
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
-    </Modal>
+    </Modal >
 }
 export default UserInfoModal;
 

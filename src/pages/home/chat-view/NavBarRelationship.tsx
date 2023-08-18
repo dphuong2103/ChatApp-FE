@@ -1,21 +1,16 @@
-import { useEffect, useState } from 'react'
-import { ChatRoomType, NewChatRoomAndUserList, RelationshipStatus, User, UserRelationship } from '../../../types/dataType'
+import { ChatRoomType, NewChatRoomAndUserList, User, UserRelationship } from '../../../types/dataType'
 import { useAppSelector } from '../../../redux/store';
 import { generateClassName } from '../../../utils/generateClassName';
 import styles from '../../../styles/NavBarRelationship.module.scss';
 import { Typography, Button } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { ChatRoomAPI, UserRelationshipAPI } from '../../../api';
-import { getRelationshipStatus } from '../../../helper/relationshipHelper';
 import { useCurrentChatRoomContext } from '../../../helper/getContext';
 function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProps) {
-  const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
-  const { newChat, handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
+  const { newChat, handleSetCurrentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
   const currentUser = useAppSelector(state => state.auth.user);
 
-  useEffect(() => {
-    setRelationshipStatus(getRelationshipStatus(relationship));
-  }, [relationship])
+
 
   async function handleSendFriendRequest() {
     if (!currentUser || !targetUser?.id) return;
@@ -66,24 +61,24 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
     }
   }
 
-  if (relationshipStatus === 'Friend') return;
+  console.log('relationshipStatus', currentChatRoomInfo?.relationshipStatus);
+  if (currentChatRoomInfo?.relationshipStatus === 'Friend') return;
 
   return (
     <div className={generateClassName(styles, ['relationship-container',
-      ...relationshipStatus === 'RequestReceived' ? ['request-received'] : [],
-      ...relationshipStatus === 'RequestSent' ? ['request-sent'] : [],
-      ...relationshipStatus === 'NotFriend' ? ['not-friend'] : []
+      ...currentChatRoomInfo?.relationshipStatus === 'RequestReceived' ? ['request-received'] : [],
+      ...currentChatRoomInfo?.relationshipStatus === 'RequestSent' ? ['request-sent'] : [],
+      ...currentChatRoomInfo?.relationshipStatus === 'NotFriend' ? ['not-friend'] : []
 
     ])}>
       {
-        relationshipStatus === 'NotFriend' && <button onClick={handleSendFriendRequest}>
+        currentChatRoomInfo?.relationshipStatus === 'NotFriend' && <button onClick={handleSendFriendRequest}>
           <PersonAddIcon />
           Add friend
         </button>
       }
       {
-        // relationship?.relationshipType === 'E_FRIEND' && relationship.status === 'E_PENDING'
-        relationshipStatus === 'RequestReceived'
+        currentChatRoomInfo?.relationshipStatus === 'RequestReceived'
         && <>
           <Typography>Friend request</Typography>
           <Button variant="outlined" color="error" onClick={handleCancelFriendRequest}>
@@ -95,7 +90,7 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
         </>
       }
       {
-        relationshipStatus === 'RequestSent' && true && <>
+        currentChatRoomInfo?.relationshipStatus === 'RequestSent' && true && <>
           <Button variant="outlined" onClick={handleCancelFriendRequest}>
             Cancel friend request
           </Button>

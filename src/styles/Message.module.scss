@@ -1,4 +1,5 @@
 @import './variables.scss';
+@import './global.scss';
 
 .message-container {
     display: flex;
@@ -59,19 +60,19 @@
             font-size: 0.80rem;
         }
 
-        & .reply-message-container {
+        & .replied-message-container {
             overflow: hidden;
             position: relative;
             padding-left: 0.5rem;
-            // min-width: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            max-width: 100%;
 
-            & .reply-message {
+            @include desktop {
+                max-width: 35rem;
+            }
+
+            & .replied-message {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;

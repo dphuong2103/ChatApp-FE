@@ -13,7 +13,8 @@
     }
 
     @include tablet {
-        width: 17rem;
+        min-width: 17rem;
+        max-width: 17rem;
         position: absolute;
         right: 0;
         top: 0;
@@ -32,9 +33,11 @@
 
     @include desktop {
         display: flex;
-        width: 17rem;
+        min-width: 17rem;
+        max-width: 17rem;
         position: initial;
         border-left: 1px solid lightgrey;
+
         &.d-none {
             display: none;
         }

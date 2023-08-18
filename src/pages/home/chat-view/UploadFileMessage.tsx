@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { chatRoomFileRef } from '../../../firebase-config';
 import { useUploadFiles } from '../../../hooks/useUploadFile'
 import { Message, MessagesActionType } from '../../../types/dataType'
@@ -34,7 +34,7 @@ function UploadFileMessage({ message }: UploadFileMessageType) {
             await MessageAPI.cancelUploadingMessageFile(message.id);
             dispatchMessage({ type: MessagesActionType.CancelUploadingMessageFile, payload: message.id })
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 

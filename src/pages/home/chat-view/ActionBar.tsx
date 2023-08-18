@@ -130,7 +130,7 @@ function ActionBar() {
                 setSelectedFile(null);
             }
         } catch (err) {
-            console.log(err)
+            console.error(err)
         }
     }
 

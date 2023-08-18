@@ -35,10 +35,9 @@ export function getChatRoomInfo(chatRoomSummary: ChatRoomSummary, relationships?
     let relationshipStatus: RelationshipStatus | undefined;
     if (chatRoomSummary.chatRoom.chatRoomType === "ONE" && relationships) {
         relationship = getRelationship(currentUserId!, partners[0].id, relationships) ?? undefined;
-    }
-    if (relationship) {
         relationshipStatus = getRelationshipStatus(relationship);
     }
+
     return {
         name,
         imgUrl,

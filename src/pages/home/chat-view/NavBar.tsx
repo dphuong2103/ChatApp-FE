@@ -13,6 +13,7 @@ function NavBar() {
     const { handleCall } = useCallContext();
     const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
     const { setShowChatInfo } = useChatContext();
+
     function handleBackClick() {
         setShowChatRoom(false);
     }
@@ -21,6 +22,7 @@ function NavBar() {
         if (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE') {
             setOpenUserInfoModal(true)
         }
+        else return undefined;
     }
 
     return (

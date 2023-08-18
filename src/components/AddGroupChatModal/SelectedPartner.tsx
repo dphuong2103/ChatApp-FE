@@ -6,7 +6,7 @@ import { X } from 'phosphor-react';
 function SelectedPartner({ user, onClick }: SelectedPartnerProps) {
     return (
         <div className={styles['selected-user-container']}>
-            <Avatar name={user.displayName} imgUrl={user.photoUrl} size={2} />
+            <Avatar name={user.displayName} imgUrl={user.photoUrl} size={2} id={user.id} />
             <Typography>{user.displayName}</Typography>
             <button onClick={onClick}><X /></button>
         </div>

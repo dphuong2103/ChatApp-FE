@@ -1,8 +1,8 @@
 import { Dispatch, PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { User } from '../../types/dataType';
 import {
-
   createUserWithEmailAndPassword,
+  firebaseLogOut,
   signInWithEmailAndPassword,
   signInWithGoogle,
   updateFirebaseUserInfo,
@@ -51,6 +51,7 @@ const authSlice = createSlice({
   },
 });
 
+
 export function loginWithEmailAndPassword(email: string, password: string) {
   return async (dispatch: Dispatch) => {
     const googleUser = await signInWithEmailAndPassword(email, password);
@@ -78,14 +79,15 @@ export function googleSignIn() {
     const googleUser = await signInWithGoogle();
     const user = await convertGoogleUserToUser(googleUser);
     if (user != null) {
+      await UserAPI.addGoogleUser(user);
       dispatch(authSlice.actions.logIn(user));
     }
   };
 }
 
-
 export function logOut() {
-  return (dispatch: Dispatch) => {
+  return async (dispatch: Dispatch) => {
+    await firebaseLogOut();
     dispatch(authSlice.actions.logOut());
     toast.info('Logged out successfully!');
   };

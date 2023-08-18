@@ -1,0 +1,44 @@
+.upload-file-message-container {
+    width: min(14rem, 90%);
+    display: flex;
+    gap: 1rem;
+
+
+    & .upload-info {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    & .file-name {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    & .upload-status {
+        display: flex;
+        // gap: 0.1rem;
+
+        & .btn {
+            background: none;
+            border: none;
+            border-radius: 50%;
+            width: 1.2rem;
+            height: 1.2rem;
+            background-color: grey;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.2rem;
+        }
+    }
+
+
+
+}

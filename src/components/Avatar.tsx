@@ -19,12 +19,12 @@ function stringToColor(string: string) {
     return color;
 }
 
-function Avatar({ name, imgUrl, onClick, size }: AvatarProps) {
+function Avatar({ name, imgUrl, onClick, size}: AvatarProps) {
     const [error, setError] = useState<React.SyntheticEvent<HTMLImageElement, Event> | null>(null);
     const sz = size ? `${size}rem` : undefined;
     const fontSize = size ? `${size / 2}rem` : undefined;
     let backgroundColor = undefined;
-    if (name) backgroundColor = (error || !imgUrl) ? stringToColor(name) : undefined;
+    if ( name) backgroundColor = (error || !imgUrl) ? stringToColor(name) : undefined;
     return <div className={generateClassName(styles, ['avatar-container', ...size ? [] : ['no-size']])} onClick={onClick} style={{
         backgroundColor: backgroundColor,
         ...onClick ? { cursor: 'pointer' } : {},
@@ -44,6 +44,7 @@ function Avatar({ name, imgUrl, onClick, size }: AvatarProps) {
 export default Avatar
 
 type AvatarProps = {
+    id?: string,
     name?: string,
     imgUrl?: string | null,
     onClick?: () => void,

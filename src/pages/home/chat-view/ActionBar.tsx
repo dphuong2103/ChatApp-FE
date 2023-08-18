@@ -1,9 +1,9 @@
 import { IconButton, Typography } from '@mui/material'
 import styles from '../../../styles/ActionBar.module.scss'
-import { PaperPlaneRight, Smiley, } from 'phosphor-react'
+import { PaperPlaneRight, Paperclip, Smiley, } from 'phosphor-react'
 import { useEffect, useRef, useState } from 'react';
 import { ChatRoomAPI, MessageAPI } from '../../../api';
-import { ChatRoomType, NewChatRoomAndUserList, NewMessage } from '../../../types/dataType';
+import { ChatRoomType, MessagesActionType, NewChatRoomAndUserList, NewMessage, NewMessageForFieldUpload } from '../../../types/dataType';
 import { useChatContext, useCurrentChatRoomContext } from '../../../helper/getContext';
 import { useAppSelector } from '../../../redux/store';
 import { useOutsideClick } from '../../../hooks/useClickOutside';
@@ -13,18 +13,26 @@ import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-const maxHeight = 100;
+import AttachedFiles from './AttachedFiles';
+import FileIcon from '../../../components/FileIcon';
+import { getExtensionFromName } from '../../../helper/getFileExtensionImage';
 
+const maxHeight = 100;
+const maxFileSizeMb = 8;
+const maxFileSizeBytes = maxFileSizeMb * 1024 * 1024;
 function ActionBar() {
     const [textInput, setTextInput] = useState('');
+    const navigate = useNavigate();
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
     const formRef = useRef<HTMLFormElement>(null);
-    const { currentChatRoomSummary, newChat, currentChatRoomInfo, handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
+    const { currentChatRoomSummary, newChat, currentChatRoomInfo, handleSetCurrentChatRoomSummary, dispatchMessage } = useCurrentChatRoomContext();
     const messageInputRef = useRef<HTMLTextAreaElement>(null);
     const { handleSetReplyToMessage, replyToMessage } = useChatContext();
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const iconButtonRef = useRef<HTMLButtonElement>(null);
-    const navigate = useNavigate();
+    const attachFileRef = useRef<HTMLInputElement | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     function handleOnTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
         setTextInput(e.target.value);
     }
@@ -59,7 +67,7 @@ function ActionBar() {
                 chatRoomId: newChatRoomSummary.chatRoom.id,
                 messageText: textInput,
                 senderId: currentUserId!,
-                replyToMessageId: replyToMessage ? replyToMessage.id : undefined
+                replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
             }
             await MessageAPI.addMessage(message);
             setTextInput('');
@@ -72,7 +80,18 @@ function ActionBar() {
     }
 
     async function sendMessage() {
+        if (selectedFile) {
+            await handleSendMessageWithFiles();
+        }
+        else {
+            await handleSendPlainMessage();
+        }
+
+    }
+
+    async function handleSendPlainMessage() {
         if (textInput === '') return;
+        const trimText = textInput.trim();
         if (!currentUserId && !currentChatRoomSummary?.chatRoom) {
             console.error('userId and chatroom is null');
             return;
@@ -80,9 +99,9 @@ function ActionBar() {
         try {
             const message: NewMessage = {
                 chatRoomId: currentChatRoomSummary!.chatRoom.id,
-                messageText: textInput,
+                messageText: trimText,
                 senderId: currentUserId!,
-                replyToMessageId: replyToMessage ? replyToMessage.id : undefined
+                replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
             }
             await MessageAPI.addMessage(message);
             setTextInput('');
@@ -90,6 +109,28 @@ function ActionBar() {
         }
         catch (err) {
             console.error('err sending message: ', err);
+        }
+    }
+
+    async function handleSendMessageWithFiles() {
+        const trimText = textInput.trim();
+        const newMessage: NewMessageForFieldUpload = {
+            chatRoomId: currentChatRoomSummary!.chatRoom.id,
+            messageText: trimText,
+            senderId: currentUserId!,
+            replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
+            fileName: selectedFile!.name
+        }
+        try {
+            const message = (await MessageAPI.addNewMessageForFileUpload(newMessage)).data;
+            if (message.type === 'Files' && message.fileStatus === 'InProgress') {
+                message.files = selectedFile!;
+                dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
+                setTextInput('');
+                setSelectedFile(null);
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -106,6 +147,20 @@ function ActionBar() {
 
     function handleEmojiSelect(e: any) {
         setTextInput(prevText => prevText + e.native)
+    }
+
+    function handleSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+        if (e.target.files && e.target.files.length > 0) {
+            if (e.target.files[0].size > maxFileSizeBytes) {
+                toast.error('Please select file  size less than: ' + maxFileSizeMb + 'mb');
+                return;
+            }
+            setSelectedFile(e.target.files[0])
+        }
+    }
+
+    function handleDeselectFile() {
+        setSelectedFile(null);
     }
 
     useEffect(() => {
@@ -136,7 +191,6 @@ function ActionBar() {
                 }
             }
         }
-
         return () => {
             document.removeEventListener('keydown', handleEscapeKeyDown);
         };
@@ -144,26 +198,40 @@ function ActionBar() {
 
     useEffect(() => {
         setTextInput('')
+        setSelectedFile(null);
     }, [newChat, currentChatRoomSummary])
 
     return (
         <form className={styles['action-bar-form']} onSubmit={handleSubmitMessage} ref={formRef}>
-            <div className={generateClassName(styles, ['reply-message-container', ...!replyToMessage ? ['d-none'] : []])}>
-                <button className={styles.close} onClick={() => handleSetReplyToMessage(null)}>
-                    <CancelIcon />
-                </button>
-                <Typography variant='body2' component='span' fontWeight='500'>Reply: {replyToMessage?.senderId !== currentUserId ? replyToMessage?.sender.displayName : ''}</Typography>
-                <Typography variant='body2' className={styles['reply-message-text']} component='span'>{replyToMessage?.messageText}</Typography>
+            <div className={generateClassName(styles, ['replied-message-wrapper', ...!replyToMessage ? ['d-none'] : []])}>
+                <div className={generateClassName(styles, ['replied-message-container', ...!replyToMessage ? ['d-none'] : []])}>
+                    <button className={styles.close} onClick={() => handleSetReplyToMessage(null)}>
+                        <CancelIcon />
+                    </button>
+                    <Typography variant='body2' component='span' fontWeight='500'>Reply: {replyToMessage?.senderId !== currentUserId ? replyToMessage?.sender.displayName : ''}</Typography>
+                    {
+                        (replyToMessage?.type === 'Files' && replyToMessage.fileName) ? <>
+                            <FileIcon extension={getExtensionFromName(replyToMessage.fileName)} style={{ width: '3rem', height: '3rem' }} />
+                        </> : <span className={styles['reply-message-text']}>{replyToMessage?.messageText}</span>
+                    }
+
+                </div>
             </div>
+
             <div className={styles['action-bar-container']}>
                 <textarea rows={1} onChange={handleOnTextChange} value={textInput} placeholder='Enter message...' onKeyDown={handleKeyDown} ref={messageInputRef} />
                 <div className={styles['btn-container']}>
                     <IconButton type='button' ref={iconButtonRef} onClick={handleClickShowEmoji} >
                         <Smiley />
                     </IconButton>
+                    <IconButton onClick={() => attachFileRef.current?.click()}>
+                        <Paperclip size={24} />
+                    </IconButton>
+                    <input type='file' style={{ display: 'none' }} ref={attachFileRef} onChange={handleSelectFile} />
                     <IconButton className={styles.send} type='submit'>
                         <PaperPlaneRight />
                     </IconButton>
+
                     <div
                         ref={emojiPickerContainerRef}
                         className={generateClassName(styles, ['emoji-picker-container', ...!showEmojiPicker ? ['d-none'] : []])} style={{
@@ -174,8 +242,10 @@ function ActionBar() {
                     </div>
                 </div>
             </div>
+            {
+                selectedFile && <AttachedFiles file={selectedFile} onFileDeselect={handleDeselectFile} />
+            }
         </form >
-
     )
 }
 

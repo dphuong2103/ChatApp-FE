@@ -63,6 +63,10 @@ function Login() {
         }
     }
 
+    function otherLogin() {
+        toast.warning("Function is under developement, please try again later!");
+    }
+
     const navigate = useNavigate();
 
     return (
@@ -154,11 +158,11 @@ function Login() {
                             <GoogleLogo color="#DF3E30" />
                         </IconButton>
 
-                        <IconButton color="inherit">
+                        <IconButton color="inherit" onClick={otherLogin}>
                             <GithubLogo />
                         </IconButton>
 
-                        <IconButton>
+                        <IconButton onClick={otherLogin} >
                             <TwitterLogo color="#1C9CEA" />
                         </IconButton>
                     </Stack>

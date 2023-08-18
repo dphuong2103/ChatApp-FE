@@ -16,6 +16,9 @@ type MessagesActionAndPayloadType = {
     payload: Message,
 } | {
     type: MessagesActionType.DELETEALL,
+} | {
+    type: MessagesActionType.CancelUploadingMessageFile,
+    payload: string
 }
 const messageReducer = (state: Message[], action: MessagesActionAndPayloadType) => {
     switch (action.type) {
@@ -25,10 +28,28 @@ const messageReducer = (state: Message[], action: MessagesActionAndPayloadType) 
             } else {
                 return [...handleTransFormMessages(state.concat(action.payload))]
             }
-        case MessagesActionType.UPSERTORDELETEMESSAGE: return [...handleTransFormMessages(handleUpsertOrDeleteMessage(state, action.payload))];
-        case MessagesActionType.GETLIST: return [...handleTransFormMessages(state.concat(action.payload))]
+        case MessagesActionType.UPSERTORDELETEMESSAGE: return handleUpsertOrDeleteMessage(state, action.payload);
+        case MessagesActionType.GETLIST: return handleGetList(action.payload, state);
         case MessagesActionType.DELETEALL: return [];
+        case MessagesActionType.CancelUploadingMessageFile: return [...handleCancelUploadingMessageFile(action.payload, state)]
     }
+}
+
+
+
+function handleGetList(payload: Message[], state: Message[]) {
+    const updateNewMessages = handleTransFormMessages(payload);
+    return [...updateNewMessages, ...state]
+}
+
+function handleCancelUploadingMessageFile(messageId: string, state: Message[]) {
+    return state.map(m => {
+        if (m.id === messageId && m.type === 'Files') {
+            m.fileStatus = 'Cancelled';
+            return { ...m }
+        }
+        return m;
+    })
 }
 
 export default function CurrentChatRoom({ children }: { children: React.ReactNode }) {
@@ -112,7 +133,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             }
         }
     }, [chatRoomSummaries, currentChatRoomSummary, relationships, newChat])
-
 
     useEffect(() => {
         updateLastMessageRead();

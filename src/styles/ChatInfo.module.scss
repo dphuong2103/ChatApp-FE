@@ -31,12 +31,10 @@
     }
 
     @include desktop {
+        display: flex;
         width: 17rem;
         position: initial;
         border-left: 1px solid lightgrey;
-        transform: translateX(0);
-        transition: transform 300ms ease-in;
-
         &.d-none {
             display: none;
         }

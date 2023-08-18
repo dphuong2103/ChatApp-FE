@@ -15,6 +15,7 @@
     @include notMobile {
         // width: initial;
         max-width: 20rem;
+        min-width: 20rem;
         border-right: 1px solid lightgray;
     }
 }

@@ -77,7 +77,7 @@ function ProfileTab() {
     }
     return (
         <div className={styles['profile-tab-container']}>
-            <UploadAvatar open={showUploadAvatar} handleClose={handleCloseUploadAvatar} />
+            <UploadAvatar open={showUploadAvatar} handleClose={handleCloseUploadAvatar} type='UserAvatar' />
             <div className={styles['navgigation-container']}>
                 <IconButton onClick={handleBackClick} >
                     <ArrowLeft />

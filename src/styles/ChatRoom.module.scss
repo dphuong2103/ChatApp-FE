@@ -18,7 +18,6 @@
         }
     }
 
-
     & .photo {
         width: 3rem;
         aspect-ratio: 1;
@@ -50,11 +49,9 @@
         & .number-of-unread-messages {
             background-color: #c31818;
             align-self: center;
-            // aspect-ratio: 1;
             color: white;
             text-align: center;
             border-radius: 30px;
-
             padding: 2px 5px;
         }
     }

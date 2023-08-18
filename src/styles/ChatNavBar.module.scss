@@ -1,6 +1,9 @@
 @import './global.scss';
 
-
+.chat-navbar-container{
+    width: 100%;
+    max-width: 100%;
+}
 .main {
     display: flex;
     align-items: center;

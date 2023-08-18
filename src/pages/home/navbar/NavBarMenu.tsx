@@ -10,7 +10,7 @@ import Avatar from '../../../components/Avatar';
 import { Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import PersonIcon from '@mui/icons-material/Person';
+import GroupIcon from '@mui/icons-material/Group';
 function NavBarMenu({ anchorEl, onClose }: NavBarMenuProps) {
     const dispatch = useAppDispatch();
     const currentUser = useAppSelector(state => state.auth.user);
@@ -56,7 +56,7 @@ function NavBarMenu({ anchorEl, onClose }: NavBarMenuProps) {
             <Divider />
             <MenuItem onClick={handleContactClick}>
                 <ListItemIcon>
-                    <PersonIcon fontSize='small' />
+                    <GroupIcon fontSize='small' />
                 </ListItemIcon>
                 Contacts
             </MenuItem>

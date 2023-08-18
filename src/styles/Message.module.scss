@@ -3,6 +3,8 @@
 .message-container {
     display: flex;
     width: 100%;
+    max-width: 100%;
+    max-width: 100%;
 
     &.right {
         flex-direction: row-reverse;
@@ -42,11 +44,15 @@
         padding: 0.5rem;
         border-radius: 10px;
         gap: 0.2rem;
-        word-wrap: break-word;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        max-width: 100%;
-        word-wrap: break-word;
         overflow: hidden;
+        width: 100%;
+
+        & .btn {
+            background: none;
+            border: none;
+            color: grey;
+        }
 
         & .time {
             color: grey;
@@ -57,17 +63,25 @@
             overflow: hidden;
             position: relative;
             padding-left: 0.5rem;
+            // min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 100%;
 
             & .reply-message {
-                display: inline-block;
-                width: 100%;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                word-wrap: break-word;
+                max-width: 100%;
             }
 
             &::before {
                 content: '';
+                top: 4px;
                 width: 2px;
                 height: 90%;
                 background: #3989ff;

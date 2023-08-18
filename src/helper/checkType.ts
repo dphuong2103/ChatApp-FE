@@ -24,4 +24,3 @@ export function isUser(object: unknown): object is User {
     }
     else return false;
 }
-

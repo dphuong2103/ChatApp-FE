@@ -1,0 +1,9 @@
+.attached-file-container {
+    position: relative;
+
+    & .btn.remove {
+        border: none;
+        background: none;
+        position: absolute;
+    }
+}

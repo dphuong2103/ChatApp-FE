@@ -33,7 +33,7 @@ function ChatContextProvider({ children }: ContextChildren) {
         }
     }, [currentChatRoomSummary?.chatRoom.id])
 
-    
+
 
     return (
         <ChatMessageContext.Provider value={{ replyToMessage, handleSetReplyToMessage, showChatInfo, setShowChatInfo, currentChatRoomSummaryOrNewChatRoom }}>{children}</ChatMessageContext.Provider>

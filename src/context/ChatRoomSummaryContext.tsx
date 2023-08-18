@@ -1,5 +1,5 @@
 import { createContext, useEffect, useReducer, useState } from 'react'
-import { ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, Message, User, UserChatRoom, UserRelationship } from '../types/dataType';
+import { ChatRoom, ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, Message, User, UserChatRoom, UserRelationship } from '../types/dataType';
 import { sortChatRoomSummary } from '../helper/filterDuplicateItemInArray';
 import { ChatRoomAPI, UserRelationshipAPI } from '../api';
 import { useHubConnection } from '../helper/getContext';
@@ -41,6 +41,9 @@ type ChatRoomSummaryAction = {
 } | {
     type: ChatRoomSummaryActionType.UpdateUser,
     payload: User
+} | {
+    type: ChatRoomSummaryActionType.UpdateChatRoom,
+    payload: ChatRoom
 }
 
 
@@ -57,7 +60,7 @@ const reducer = (state: ChatRoomSummary[], action: ChatRoomSummaryAction) => {
             }
         case ChatRoomSummaryActionType.UPSERT: {
             console.log('ChatRoomSummaryActionType.UPSERT')
-            return [...handeUpsertChatRoom(state, action.payload)]
+            return [...handeUpsertChatRoomSummary(state, action.payload)]
         };
         case ChatRoomSummaryActionType.UPDATELATESTMESSAGE: {
             console.log('ChatRoomSummaryActionType.UPDATELATESTMESSAGE')
@@ -98,7 +101,9 @@ const reducer = (state: ChatRoomSummary[], action: ChatRoomSummaryAction) => {
         case ChatRoomSummaryActionType.UpdateUser: {
             return [...handleUpdateUser(state, action.payload)]
         }
-
+        case ChatRoomSummaryActionType.UpdateChatRoom: {
+            return [...handleUpdateChatRoom(state, action.payload)]
+        }
     }
 }
 
@@ -112,6 +117,16 @@ function handleRemoveUserFromGroupChat(state: ChatRoomSummary[], request: ChatRo
     return state.map(crs => {
         if (crs.chatRoom.id === request.chatRoomId) {
             crs.users = crs.users.filter(u => u.id !== request.userId);
+        }
+        return crs;
+    })
+}
+
+function handleUpdateChatRoom(state: ChatRoomSummary[], request: ChatRoom) {
+    return state.map(crs => {
+        if (crs.chatRoom.id === request.id) {
+            crs.chatRoom = request;
+            return { ...crs };
         }
         return crs;
     })
@@ -142,7 +157,6 @@ function handleUpdateUserChatRoom(userChatRoom: UserChatRoom, state: ChatRoomSum
     })
     return state;
 }
-
 
 function handleUpdateCRSOnReceiveMessage(state: ChatRoomSummary[], message: Message, currentChatRoomId?: string) {
     if (message.chatRoomId === currentChatRoomId) {
@@ -195,7 +209,7 @@ function handleUpdateChatRoomName(state: ChatRoomSummary[], request: ChatRoomIdA
     return newState;
 }
 
-function handeUpsertChatRoom(state: ChatRoomSummary[], payload: ChatRoomSummary) {
+function handeUpsertChatRoomSummary(state: ChatRoomSummary[], payload: ChatRoomSummary) {
     let chatRoomExists = false;
     state.map(crSummary => {
         if (crSummary.chatRoom.id === payload.chatRoom.id) {
@@ -227,13 +241,16 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
     const [chatRoomSummaries, dispatchChatRoomSummary] = useReducer(reducer, initState);
     const [relationships, setRelationships] = useState<UserRelationship[]>([]);
     const { connection } = useHubConnection();
+    const [loadingChatRoomSummary, setLoadingChatRoomSummary] = useState(true);
     const authState = store.getState().auth;
+
     useEffect(() => {
         const abortController = new AbortController();
         if (authState.user?.id) {
             getChatRoomSummaries();
             getUserRelationships();
             async function getChatRoomSummaries() {
+                setLoadingChatRoomSummary(true);
                 try {
                     const chatRoomSummariesResponse = await ChatRoomAPI.getUserChatRooms(abortController);
                     if (chatRoomSummariesResponse != null && chatRoomSummariesResponse.data.length > 0) {
@@ -242,9 +259,13 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
                 } catch (err) {
                     console.error(err);
                 }
+                finally {
+                    setLoadingChatRoomSummary(false);
+                }
             };
 
             async function getUserRelationships() {
+
                 try {
                     const userRelationships = await UserRelationshipAPI.getUserRelationship(abortController);
                     if (userRelationships != null) {
@@ -280,7 +301,7 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
             connection.on(ChatRoomSummaryConnectionFunction.AddMembersToChatRoom, (request: ChatRoomIdAndUsers) => {
                 dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.AddMembersToChatRoom, payload: request })
             })
-            connection.on(ConnectionFunction.ReceivedChatRoom, (newChatRoomSummary: ChatRoomSummary) => {
+            connection.on(ConnectionFunction.ReceivedChatRoomSummary, (newChatRoomSummary: ChatRoomSummary) => {
                 if (isChatRoomSummary(newChatRoomSummary)) {
                     dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UPSERT, payload: newChatRoomSummary })
                 }
@@ -291,6 +312,10 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
 
             connection.on(ChatRoomSummaryConnectionFunction.UpdateChatRoomName, (request: ChatRoomIdAndName) => {
                 dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateChatRoomName, payload: request })
+            })
+
+            connection.on(ChatRoomSummaryConnectionFunction.ReceivedChatRoom, (request: ChatRoom) => {
+                dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateChatRoom, payload: request })
             })
 
         }
@@ -321,7 +346,7 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
     }
 
     return (
-        <ChatRoomSummaryContextProvider.Provider value={{ chatRoomSummaries, dispatchChatRoomSummary, relationships, setRelationships }}>{children}</ChatRoomSummaryContextProvider.Provider>
+        <ChatRoomSummaryContextProvider.Provider value={{ chatRoomSummaries, dispatchChatRoomSummary, relationships, setRelationships, loadingChatRoomSummary }}>{children}</ChatRoomSummaryContextProvider.Provider>
     )
 }
 
@@ -331,5 +356,6 @@ type ChatRoomSummaryContextValue = {
     chatRoomSummaries: ChatRoomSummary[];
     dispatchChatRoomSummary: React.Dispatch<ChatRoomSummaryAction>,
     relationships: UserRelationship[],
-    setRelationships: React.Dispatch<React.SetStateAction<UserRelationship[]>>
+    setRelationships: React.Dispatch<React.SetStateAction<UserRelationship[]>>,
+    loadingChatRoomSummary: boolean
 }

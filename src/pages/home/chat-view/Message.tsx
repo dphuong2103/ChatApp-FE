@@ -12,7 +12,10 @@ import { toast } from 'react-toastify';
 import MessageActionMenu from './MessageActionMenu';
 import { MessageAPI } from '../../../api';
 import { useChatContext } from '../../../helper/getContext';
-
+import UploadFileMessage from './UploadFileMessage';
+import DownloadFileMessage from './DownloadFileMessage';
+import CancelledFileMessage from './CancelledFileMessage';
+import FileIcon from '../../../components/FileIcon';
 function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
     const currentUserId = useAppSelector(state => state.auth.user?.id);
@@ -56,14 +59,21 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     message.senderId !== currentUserId && <Avatar name={message.sender.displayName} imgUrl={message.sender.photoUrl} onClick={onAvatarClick} />
                 }
                 <div className={styles['message-info']}>
+                    <DownloadFileMessage message={message} />
+                    <UploadFileMessage message={message} />
+                    <CancelledFileMessage message={message} />
                     <div className={generateClassName(styles, ['reply-message-container', ...message.replyToMessage ? [] : ['d-none']])}>
                         <Typography component='span' variant='body2' fontWeight={500}>{message.replyToMessage?.sender.displayName}</Typography>
-                        <Typography component='span' variant='body2' className={styles['reply-message']}>{message.replyToMessage?.messageText}</Typography>
+                        {
+                            message.replyToMessage?.type === 'Files' && message.replyToMessage.fileName ? <FileIcon extension={message.replyToMessage.fileName.split('.').pop() ?? ''} style={{ width: '2.5rem', height: '2.5rem' }} /> :
+                                <div className={styles['reply-message']}>{message.replyToMessage?.messageText}</div>
+                        }
                     </div>
                     <Typography color='black' >{message.messageText}</Typography>
                     <span className={styles.time}>{messageTime(message.createdTime)}</span>
                 </div>
             </div>
+
             <div className={styles['message-actions-container']}>
                 <button className={styles.action} onClick={() => handleSetReplyToMessage(message)}>
                     <FormatQuoteIcon />

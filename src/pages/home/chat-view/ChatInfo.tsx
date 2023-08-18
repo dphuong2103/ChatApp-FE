@@ -18,6 +18,7 @@ import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import ChatMembers from './ChatMembers';
 import UpdateChatRoomNameModal from './UpdateChangeRoomNameModal';
 import UserInfoModal from '../../../components/UserInfoModal';
+import UploadAvatar from '../navbar/ProfileTab/UploadAvatar';
 
 function ChatInfo() {
   const { currentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
@@ -27,6 +28,7 @@ function ChatInfo() {
   const [showChatMembers, setShowChatMembers] = useState(false);
   const [openUpdateChatNameModal, setOpenUpdateChatNameModal] = useState(false);
   const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
+  const [openUploadAvatar, setOpenUploadAvatar] = useState(false);
   async function handleClickMute() {
     if (!currentChatRoomSummary) return;
 
@@ -60,6 +62,9 @@ function ChatInfo() {
     if (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE') {
       setOpenUserInfoModal(true)
     }
+    else if (currentChatRoomSummary?.chatRoom.chatRoomType === 'MANY') {
+      setOpenUploadAvatar(true);
+    }
   }
 
   useEffect(() => {
@@ -79,6 +84,7 @@ function ChatInfo() {
 
           <div className={styles['avatar-container']}>
             <Avatar imgUrl={currentChatRoomInfo?.imgUrl} name={currentChatRoomInfo?.name} size={5} onClick={handleClickAvatar} />
+            <UploadAvatar open={openUploadAvatar} handleClose={() => setOpenUploadAvatar(false)} type='ChatRoomAvatar' />
           </div>
           <UserInfoModal
             open={openUserInfoModal}
@@ -165,7 +171,6 @@ function ChatInfo() {
           </MenuList>
 
         </div>
-
       }
 
     </aside >

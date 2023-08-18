@@ -3,17 +3,30 @@ import { useState } from 'react';
 import Avatar from 'react-avatar-edit';
 import styles from '../../../../styles/UploadAvatar.module.scss';
 import { useAppDispatch, useAppSelector } from '../../../../redux/store';
-import { UserAPI } from '../../../../api';
+import { ChatRoomAPI, UserAPI } from '../../../../api';
 import { getDownloadURL } from 'firebase/storage';
 import { updateUserProfile } from '../../../../redux/slices/auth';
 import { User } from '../../../../types/dataType';
 import { toast } from 'react-toastify';
+import { useCurrentChatRoomContext } from '../../../../helper/getContext';
 const prefixString = 'data:image/png;base64,';
-function UploadAvatar({ open, handleClose }: UploadAvatarProps) {
+
+function UploadAvatar({ open, handleClose, type }: UploadAvatarProps) {
     const [cropImg, setCropImg] = useState('');
     const dispatch = useAppDispatch();
     const currentUser = useAppSelector(state => state.auth.user);
+    const { currentChatRoomSummary } = useCurrentChatRoomContext();
+
     async function handleUploadAvatar() {
+        if (type === 'ChatRoomAvatar') {
+            await handleUploadChatRoomAvatar()
+        }
+        else if (type === 'UserAvatar') {
+            await handleUploadUserAvatar();
+        }
+    }
+
+    async function handleUploadUserAvatar() {
         if (!currentUser || !currentUser.id || !cropImg) return;
         try {
             var uploadResult = await UserAPI.uploadUserAvatar(currentUser.id, cropImg)
@@ -24,6 +37,18 @@ function UploadAvatar({ open, handleClose }: UploadAvatarProps) {
             toast.success('Image uploaded successfully!')
         } catch (err) {
             console.error('Error uploading image', err);
+            toast.error('Error uploading image, please try again!');
+        }
+    }
+
+    async function handleUploadChatRoomAvatar() {
+        try {
+            await ChatRoomAPI.uploadChatRoomAvatar(currentChatRoomSummary!.chatRoom.id, cropImg);
+            handleClose();
+            toast.success('Image uploaded successfully!')
+        } catch (err) {
+            console.error('Error uploading image', err);
+            toast.error('Error uploading image, please try again!');
         }
     }
 
@@ -57,5 +82,6 @@ export default UploadAvatar
 
 type UploadAvatarProps = {
     open: boolean,
-    handleClose: () => void
+    handleClose: () => void,
+    type: 'UserAvatar' | 'ChatRoomAvatar'
 }

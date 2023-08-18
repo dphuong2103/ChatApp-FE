@@ -42,12 +42,17 @@ export type ChatRoom = {
   creator: User;
   creatorId: string;
   isDeleted: boolean;
-  photoUrl?: string;
+  photoUrl?: string | null;
 };
 export type NewChatRoom = Omit<ChatRoom, 'id' | 'isDeleted' | 'creator' | 'photoUrl'>
 export type AddMembersToChatGroup = {
   chatRoomId: string,
   userIds: string[]
+}
+
+export type ChatRoomIdAndImageUrl = {
+  chatRoomId: string,
+  photoUrl: string
 }
 
 export type SignInUser = {
@@ -100,16 +105,41 @@ export type RemoveFromGroupChat = {
 
 export type Message = {
   id: string;
-  messageText: string;
   senderId: string;
   sender: User;
   chatRoomId: string;
   chatRoom: ChatRoom;
+  createdTime: Date;
+  isDeleted: boolean;
+  messageText: string;
   replyToMessageId?: string;
   replyToMessage?: Message;
-  createdTime: Date;
-  isDeleted: boolean
+} & ({
+  type: 'PlainText'
+} | ({
+  type: 'Files',
+} & ({
+  fileStatus: 'InProgress',
+  files: File,
+  fileName: string
+} | {
+  fileStatus: 'Cancelled',
+  fileName: string
+} | {
+  fileStatus: 'Done',
+  fileUrls: string;
+  fileName: string
 }
+  )
+  )
+  )
+
+export type NewMessage = Pick<Message, 'senderId' | 'chatRoomId' | 'replyToMessageId' | 'messageText'>
+export type NewMessageForFieldUpload = Pick<Message & {
+  fileName: string
+}, 'senderId' | 'chatRoomId' | 'replyToMessageId' | 'messageText' | 'fileName'>
+
+
 
 export type MessageRead = {
   messageId: string;
@@ -117,9 +147,6 @@ export type MessageRead = {
   userId: string;
   User: User;
 }
-
-
-export type NewMessage = Omit<Message, 'id' | 'createdTime' | 'chatRoom' | 'createdTime' | 'isDeleted' | 'sender' | 'replyToMessage'>;
 
 export type ContextChildren = {
   children: React.ReactNode
@@ -133,11 +160,12 @@ export enum MessagesActionType {
   FIRSTGET,
   UPSERTORDELETEMESSAGE,
   DELETEALL,
-  GETLIST
+  GETLIST,
+  CancelUploadingMessageFile
 }
 
 export enum ConnectionFunction {
-  ReceivedChatRoom = 'ReceivedChatroom',
+  ReceivedChatRoomSummary = 'ReceivedChatRoomSummary',
   ReceivedMessage = 'receivedmessage',
   ReceiveCall = 'ReceiveCall',
   UpdateConnectionId = 'updateconnectionid',
@@ -152,6 +180,7 @@ export enum ChatRoomSummaryConnectionFunction {
   RemoveUserFromGroupChat = 'removeuserfromgroupchat',
   AddMembersToChatRoom = 'addmemberstochatroom',
   UpdateChatRoomName = 'updatechatroomname',
+  ReceivedChatRoom = 'receivedchatroom'
 }
 
 export enum ChatRoomSummaryActionType {
@@ -165,7 +194,8 @@ export enum ChatRoomSummaryActionType {
   DeleteAll,
   UpdateUnReadMessageCountOnChatRoomOpen,
   UpdateChatRoomSMROnReceiveMessage,
-  UpdateUser
+  UpdateUser,
+  UpdateChatRoom
 }
 
 export type ChatRoomIdAndUsers = {

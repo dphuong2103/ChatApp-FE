@@ -1,0 +1,32 @@
+@import './variables.scss';
+
+.download-file-message-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 4rem;
+
+    & .file-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        overflow: hidden;
+    }
+
+    & .file-name {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    & .file-size {
+        font-size: $text-sizes-components-button-g;
+    }
+}
+
+.btn {
+    background: none;
+    border: none;
+    color: grey;
+}

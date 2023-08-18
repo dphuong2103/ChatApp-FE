@@ -28,5 +28,7 @@ export const UserAPI = {
     getUserById: function (userId: string) {
         return myAxios().get<User>(`${API_URL_USER}/${userId}`);
     },
-
+    addGoogleUser: function (user: User, abortController?: AbortController) {
+        return myAxios(abortController).post<User>(`${API_URL_USER}/google`, JSON.stringify(user));
+    },
 };

@@ -39,8 +39,6 @@ export function getChatRoomInfo(chatRoomSummary: ChatRoomSummary, relationships?
     if (relationship) {
         relationshipStatus = getRelationshipStatus(relationship);
     }
-
-
     return {
         name,
         imgUrl,

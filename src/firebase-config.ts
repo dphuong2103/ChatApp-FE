@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
-  updateProfile
+  updateProfile,
 } from 'firebase/auth';
 import { getStorage, ref } from "firebase/storage";
 const firebaseConfig = {
@@ -23,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
+provider.setCustomParameters({ prompt: 'select_account' });
 export function signInWithEmailAndPassword(email: string, password: string) {
   return signInWithEmail(auth, email, password);
 }
@@ -57,3 +57,6 @@ export function updateFirebaseUserInfo(updateInfo: updateInfo) {
 }
 export const storage = getStorage(app);
 export const userAvatarListRef = ref(storage, 'images/useravatar')
+export const chatRoomFileRef =
+  (chatRoomId: string, fileName: string) => ref(storage, `chatrooms/messagefiles/${chatRoomId}/${fileName}`)
+export const firebaseLogOut = () => auth.signOut();

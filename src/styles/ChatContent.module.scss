@@ -2,6 +2,7 @@
     flex: 1;
     overflow: hidden;
     position: relative;
+    max-width: 100%;
 }
 
 .container-scrollable {
@@ -25,7 +26,6 @@
     &.d-none {
         display: none;
     }
-
 
     & .btn-to-bottom {
         position: relative;

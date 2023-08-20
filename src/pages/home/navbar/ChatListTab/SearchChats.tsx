@@ -21,14 +21,19 @@ function SearchChats() {
     searchAndFilter();
     async function searchAndFilter() {
       if (searchInputDebounce === '') {
-      setSearchResult([]);
+        setSearchResult([]);
         return;
       }
 
       var filterAndSearchResults: (ChatRoomSummary | User)[] = filterChatRoom(chatRoomSummaries, searchInputDebounce);
       if (isValidEmail(searchInputDebounce)) {
-        var searchedUsersByEmail = await searchUserByEmail();
-        filterAndSearchResults = removeDuplicateChat(filterAndSearchResults, searchedUsersByEmail);
+        try {
+          var searchedUsersByEmail = await searchUserByEmail();
+          filterAndSearchResults = removeDuplicateChat(filterAndSearchResults, searchedUsersByEmail);
+        } catch (err) {
+          console.log(err);
+        }
+
       }
       setSearchResult([...filterAndSearchResults])
     }

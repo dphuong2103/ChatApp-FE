@@ -15,6 +15,9 @@ const UserChatRoomAPI = {
     },
     removeMemberFromGroupChat: function (request: RemoveFromGroupChat) {
         return myAxios().put(`${API_URL_USERCHATROOM}/removefromgroupchat`, JSON.stringify(request))
+    },
+    leavechatroom: function (userChatRoomId: string) {
+        return myAxios().put(`${API_URL_USERCHATROOM}/${userChatRoomId}/leavechatroom`);
     }
 }
 export default UserChatRoomAPI;

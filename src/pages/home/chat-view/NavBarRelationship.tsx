@@ -61,7 +61,6 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
     }
   }
 
-  console.log('relationshipStatus', currentChatRoomInfo?.relationshipStatus);
   if (currentChatRoomInfo?.relationshipStatus === 'Friend') return;
 
   return (

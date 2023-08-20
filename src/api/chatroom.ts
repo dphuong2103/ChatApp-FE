@@ -35,6 +35,7 @@ const ChatRoomAPI = {
     getChatRoomAvatar: function (chatRoomId: string) {
         const imageRef = ref(storage, `images/chatroomavatar/${chatRoomId}`);
         return getDownloadURL(imageRef);
-    }
+    },
+    
 }
 export default ChatRoomAPI;

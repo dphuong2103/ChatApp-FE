@@ -1,7 +1,6 @@
 import axios from 'axios'
-
-// export const BASEURL = 'https://localhost:59761';
 export let BASEURL = 'http://localhost:7012';
+// export let BASEURL = 'https://localhost:59284';
 if (import.meta.env.PROD) {
     BASEURL = 'https://midouz.online:8080';
 }

@@ -285,7 +285,6 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
 
     useEffect(() => {
         if (!authState.isLoggedIn) {
-
             dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.DeleteAll })
         }
     }, [authState.isLoggedIn])

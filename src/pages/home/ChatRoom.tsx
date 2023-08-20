@@ -12,7 +12,7 @@ function ChatRoom({ chatRoomSummary, onClick, isSelected }: ChatRoomProps) {
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const senderName = chatRoomSummary.latestMessage?.sender.id === currentUserId ? 'You' : chatRoomSummary.latestMessage?.sender.displayName;
     const lastMesesage = `${senderName ?? ''}: ${chatRoomSummary.latestMessage?.messageText}`;
-    
+
     useEffect(() => {
         setChatNameAndPhoto(getChatRoomInfo(chatRoomSummary));
     }, [chatRoomSummary]);

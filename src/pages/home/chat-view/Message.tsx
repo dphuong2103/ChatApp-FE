@@ -20,6 +20,7 @@ function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const { handleSetReplyToMessage } = useChatContext();
+
     function handleMenuClick(e: React.MouseEvent<HTMLElement>) {
         setMessageMenuAnchorEl(e.currentTarget);
     }
@@ -84,7 +85,9 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     <MoreHorizIcon />
                 </button>
             </div>
+            
             <MessageActionMenu anchorEl={messageMenuAnchorEl} onClose={handleOnCloseMessageMenu} copy={hanldeCopyToClipBoard} deleteMessage={handleDeleteMessage} />
+        
         </div>
     )
 }

@@ -11,7 +11,7 @@ export default function HubConnection({ children }: ContextChildren) {
     const [connection, setConnection] = useState<HubConnectionType | null>(null);
     const [connectionId, setConnectionId] = useState('');
     const currentUserId = useAppSelector(state => state.auth.user?.id);
-
+    const [reconnecting, setReconnecting] = useState(false);
     useEffect(() => {
         connectionSignalR();
 
@@ -20,11 +20,18 @@ export default function HubConnection({ children }: ContextChildren) {
                 try {
                     const newConnection = new HubConnectionBuilder()
                         .withUrl(`${BASEURL}/chathub`, { skipNegotiation: true, transport: HttpTransportType.WebSockets, withCredentials: true })
-                        .configureLogging(LogLevel.Information).build();
+                        .configureLogging(LogLevel.Information)
+                        .withAutomaticReconnect()
+                        .build();
 
 
                     newConnection.on(ConnectionFunction.UpdateConnectionId, (connectionId: string) => { setConnectionId(connectionId) });
-
+                    newConnection.onreconnecting(() => {
+                        setReconnecting(true);
+                    });
+                    newConnection.onreconnected(() => {
+                        setReconnecting(false);
+                    });
                     newConnection.onclose((e) => {
                         setConnection(null);
                         console.warn("Connection closed:", e);
@@ -68,7 +75,7 @@ export default function HubConnection({ children }: ContextChildren) {
     }
 
     return (
-        <HubConnectionContext.Provider value={{ connection, openChatRoom, connectionId }}>{children}</HubConnectionContext.Provider>
+        <HubConnectionContext.Provider value={{ connection, openChatRoom, connectionId,reconnecting }}>{children}</HubConnectionContext.Provider>
     )
 }
 
@@ -77,5 +84,6 @@ export default function HubConnection({ children }: ContextChildren) {
 type HubConnectionProps = {
     connection: HubConnectionType | null,
     openChatRoom: (newChatRoomId: string, oldChatRoomId?: string) => Promise<void>,
-    connectionId: string
+    connectionId: string,
+    reconnecting: boolean
 }

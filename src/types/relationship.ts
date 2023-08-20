@@ -1,3 +1,3 @@
-export type FriendRequest={
-    
+export type FriendRequest = {
+
 }

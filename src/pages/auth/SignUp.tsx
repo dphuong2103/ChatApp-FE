@@ -48,7 +48,7 @@ function SignUp() {
         }
         catch (err) {
             if (err instanceof FirebaseError) {
-                toast.error('Invalid email or password, please try again!');
+                toast.error(err.message);
             } else {
                 toast.error('Cannot sign up now, please try again later!');
             }

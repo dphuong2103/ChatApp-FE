@@ -35,8 +35,6 @@ const messageReducer = (state: Message[], action: MessagesActionAndPayloadType) 
     }
 }
 
-
-
 function handleGetList(payload: Message[], state: Message[]) {
     const updateNewMessages = handleTransFormMessages(payload);
     return [...updateNewMessages, ...state]
@@ -122,6 +120,7 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             name: user.displayName,
             imgUrl: user.photoUrl,
             partners: [user],
+            relationshipStatus: 'NotFriend'
         });
     }
 

@@ -70,7 +70,6 @@ export function filterChatRoom(chatRoomSummaries: ChatRoomSummary[], filterValue
 
         return false;
     });
-
 }
 
 export function removeDuplicateChat(searchLists: (ChatRoomSummary | User)[], users: User[]) {

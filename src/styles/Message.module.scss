@@ -16,7 +16,6 @@
     }
 }
 
-
 .message-card {
     padding: 0.5rem;
     display: flex;
@@ -28,7 +27,6 @@
 
         & .message-info {
             background-color: #e5efff;
-
         }
     }
 
@@ -100,15 +98,15 @@
 }
 
 .message-actions-container {
-    display: flex;
     align-items: center;
     background: #c5c7c7;
-    align-self: center;
+    align-self: flex-end;
     padding: 0.4rem;
     border-radius: 10px;
     gap: 0.5rem;
     display: none;
     justify-content: center;
+    transform: translateY(-10px);
 
     & .action {
         width: 18px;

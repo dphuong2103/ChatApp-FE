@@ -1,4 +1,4 @@
-import { IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Typography } from '@mui/material';
 import Avatar from '../../../components/Avatar';
 import { useChatContext, useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../../helper/getContext';
 import styles from '../../../styles/ChatInfo.module.scss';
@@ -19,6 +19,8 @@ import ChatMembers from './ChatMembers';
 import UpdateChatRoomNameModal from './UpdateChangeRoomNameModal';
 import UserInfoModal from '../../../components/UserInfoModal';
 import UploadAvatar from '../navbar/ProfileTab/UploadAvatar';
+import { roundToNearestMinutes } from 'date-fns';
+import { toast } from 'react-toastify';
 
 function ChatInfo() {
   const { currentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
@@ -29,6 +31,7 @@ function ChatInfo() {
   const [openUpdateChatNameModal, setOpenUpdateChatNameModal] = useState(false);
   const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
   const [openUploadAvatar, setOpenUploadAvatar] = useState(false);
+  const [openLeaveChatDialog, setOpenLeaveChatDialog] = useState(false);
   async function handleClickMute() {
     if (!currentChatRoomSummary) return;
 
@@ -45,8 +48,16 @@ function ChatInfo() {
     }
   }
 
-  function handleLeave(_event: React.MouseEvent<HTMLLIElement, MouseEvent>): void {
-    throw new Error('Function not implemented.');
+  async function handleLeave() {
+    if (!currentChatRoomSummary?.userChatRoom.id) return;
+    try {
+      await UserChatRoomAPI.leavechatroom(currentChatRoomSummary.userChatRoom.id);
+    } catch (err) {
+      toast.error("Error leaving chat room, please try again later!");
+      console.log(err);
+    } finally {
+      setOpenLeaveChatDialog(true);
+    }
   }
 
   function handleClickBack() {
@@ -155,7 +166,7 @@ function ChatInfo() {
               <ListItemText>Delete messages</ListItemText>
             </MenuItem>
 
-            {currentChatRoomSummary?.chatRoom.chatRoomType === 'MANY' && <MenuItem onClick={handleLeave}>
+            {currentChatRoomSummary?.chatRoom.chatRoomType === 'MANY' && <MenuItem onClick={() => setOpenLeaveChatDialog(true)}>
               <ListItemIcon >
                 <ExitToAppOutlinedIcon fontSize="small" color='error' />
               </ListItemIcon>
@@ -169,7 +180,22 @@ function ChatInfo() {
               <ListItemText sx={{ color: 'red' }}>Delete chat room</ListItemText>
             </MenuItem>}
           </MenuList>
-
+          <Dialog
+            open={openLeaveChatDialog}
+            onClose={() => setOpenLeaveChatDialog(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Are you sure you want to leave this chat room?"}
+            </DialogTitle>
+            <DialogActions>
+              <Button onClick={() => setOpenLeaveChatDialog(false)}>Cancel</Button>
+              <Button onClick={handleLeave} autoFocus color='error' >
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       }
 

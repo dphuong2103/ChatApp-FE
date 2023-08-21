@@ -50,3 +50,9 @@ export function fromMimeToType(mime?: string) {
 export function getExtensionFromName(name: string) {
     return name.split('.').pop() ?? ''
 }
+
+export function isImageFromFileName(name: string) {
+    return imagesExtension.includes(getExtensionFromName(name));
+}
+
+const imagesExtension = ['jpg', 'png', 'svg']

@@ -34,8 +34,10 @@ const MessageAPI = {
     },
     cancelUploadingMessageFile(messageId: string) {
         return myAxios().put(`${API_URL_MESSAGE}/${messageId}/canceluploadingmessagefile`);
+    },
+    getMissingMessages(lastMessageId: string) {
+        return myAxios().get<Message[]>(`${API_URL_MESSAGE}/${lastMessageId}/getmissingmessages`);
     }
-
 }
 export default MessageAPI;
 

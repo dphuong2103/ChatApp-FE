@@ -1,8 +1,11 @@
 import { createContext, useEffect, useState } from 'react';
 import { HttpTransportType, HubConnectionBuilder, LogLevel, HubConnection as HubConnectionType } from '@microsoft/signalr';
 import { ConnectionFunction, ContextChildren, InvokeServerFunction } from '../types/dataType';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
 import { BASEURL } from '../api/config';
+import { toast } from 'react-toastify';
+import { logOut } from '../redux/slices/auth';
+import { closeLoadingSpinner, showLoadingSpinner } from '../redux/slices/loadingSpinner';
 
 export const HubConnectionContext = createContext({} as HubConnectionProps);
 
@@ -12,6 +15,7 @@ export default function HubConnection({ children }: ContextChildren) {
     const [connectionId, setConnectionId] = useState('');
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const [reconnecting, setReconnecting] = useState(false);
+    const dispatch = useAppDispatch();
     useEffect(() => {
         connectionSignalR();
 
@@ -23,18 +27,13 @@ export default function HubConnection({ children }: ContextChildren) {
                         .configureLogging(LogLevel.Information)
                         .withAutomaticReconnect()
                         .build();
-
-
                     newConnection.on(ConnectionFunction.UpdateConnectionId, (connectionId: string) => { setConnectionId(connectionId) });
-                    newConnection.onreconnecting(() => {
-                        setReconnecting(true);
-                    });
-                    newConnection.onreconnected(() => {
-                        setReconnecting(false);
-                    });
                     newConnection.onclose((e) => {
                         setConnection(null);
+                        toast.error('Cannot connect to the server, please login again');
                         console.warn("Connection closed:", e);
+                        dispatch(logOut());
+                        setReconnecting(false);
                     })
 
                     await newConnection.start().then(() => {
@@ -47,35 +46,37 @@ export default function HubConnection({ children }: ContextChildren) {
                         await newConnection.invoke(InvokeServerFunction.UserOnline, currentUserId)
                     }
 
+                    newConnection.onreconnecting(() => {
+                        setReconnecting(true);
+                        console.log('reconnecting')
+                        dispatch(showLoadingSpinner());
+                    });
+
+                    newConnection.onreconnected(async (connectionId) => {
+                        setReconnecting(false);
+                        if (connectionId) setConnectionId(connectionId);
+                        await newConnection.invoke(InvokeServerFunction.UserOnline, currentUserId)
+                        setConnection(newConnection);
+                        dispatch(closeLoadingSpinner());
+                    });
+
                     setConnection(newConnection);
                 }
                 catch (err) {
-                    console.error(err);
+                    console.error('error connecting to hub server', err);
                 }
             }
         }
         return () => {
             connection?.stop();
             setConnection(null);
+            setConnectionId('');
         }
     }, [])
 
-    async function openChatRoom(newChatRoomId: string, oldChatRoomId?: string,) {
-        if (!connection) {
-            console.warn('No connection')
-            return;
-        }
-        try {
-            if (oldChatRoomId) connection.invoke(InvokeServerFunction.CloseChatRoom, oldChatRoomId)
-            connection.invoke(InvokeServerFunction.OpenChatRoom, newChatRoomId)
-        } catch (err) {
-
-            console.error('Cannot call server function: ', err)
-        }
-    }
 
     return (
-        <HubConnectionContext.Provider value={{ connection, openChatRoom, connectionId,reconnecting }}>{children}</HubConnectionContext.Provider>
+        <HubConnectionContext.Provider value={{ connection, connectionId, reconnecting }}>{children}</HubConnectionContext.Provider>
     )
 }
 
@@ -83,7 +84,6 @@ export default function HubConnection({ children }: ContextChildren) {
 
 type HubConnectionProps = {
     connection: HubConnectionType | null,
-    openChatRoom: (newChatRoomId: string, oldChatRoomId?: string) => Promise<void>,
     connectionId: string,
     reconnecting: boolean
 }

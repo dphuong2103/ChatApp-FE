@@ -19,7 +19,6 @@ import ChatMembers from './ChatMembers';
 import UpdateChatRoomNameModal from './UpdateChangeRoomNameModal';
 import UserInfoModal from '../../../components/UserInfoModal';
 import UploadAvatar from '../navbar/ProfileTab/UploadAvatar';
-import { roundToNearestMinutes } from 'date-fns';
 import { toast } from 'react-toastify';
 
 function ChatInfo() {

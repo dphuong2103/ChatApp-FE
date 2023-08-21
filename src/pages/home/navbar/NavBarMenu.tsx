@@ -16,7 +16,7 @@ function NavBarMenu({ anchorEl, onClose }: NavBarMenuProps) {
     const currentUser = useAppSelector(state => state.auth.user);
     const navigate = useNavigate();
     function handleLogOut() {
-        dispatch(logOut());
+        dispatch(logOut(true));
         onClose();
     }
     function handleSettingClick() {

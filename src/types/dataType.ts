@@ -139,8 +139,6 @@ export type NewMessageForFieldUpload = Pick<Message & {
   fileName: string
 }, 'senderId' | 'chatRoomId' | 'replyToMessageId' | 'messageText' | 'fileName'>
 
-
-
 export type MessageRead = {
   messageId: string;
   message: Message;
@@ -161,7 +159,8 @@ export enum MessagesActionType {
   UPSERTORDELETEMESSAGE,
   DELETEALL,
   GETLIST,
-  CancelUploadingMessageFile
+  CancelUploadingMessageFile,
+  GetMissingMessages
 }
 
 export enum ConnectionFunction {

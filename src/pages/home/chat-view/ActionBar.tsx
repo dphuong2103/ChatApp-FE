@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import AttachedFiles from './AttachedFiles';
 import FileIcon from '../../../components/FileIcon';
-import { getExtensionFromName } from '../../../helper/getFileExtensionImage';
+import { getExtensionFromName, isImageFromFileName } from '../../../helper/getFileExtensionImage';
 
 const maxHeight = 100;
 const maxFileSizeMb = 8;
@@ -210,11 +210,13 @@ function ActionBar() {
                     </button>
                     <Typography variant='body2' component='span' fontWeight='500'>Reply: {replyToMessage?.senderId !== currentUserId ? replyToMessage?.sender.displayName : ''}</Typography>
                     {
-                        (replyToMessage?.type === 'Files' && replyToMessage.fileName) ? <>
-                            <FileIcon extension={getExtensionFromName(replyToMessage.fileName)} style={{ width: '3rem', height: '3rem' }} />
+                        (replyToMessage?.type === 'Files' && replyToMessage.fileName && replyToMessage.fileStatus === 'Done') ? <>
+                            {
+                                isImageFromFileName(replyToMessage.fileName) ? <img src={replyToMessage.fileUrls} className={styles.image} /> : <FileIcon extension={getExtensionFromName(replyToMessage.fileName)} style={{ width: '3rem', height: '3rem' }} />
+                            }
+
                         </> : <span className={styles['reply-message-text']}>{replyToMessage?.messageText}</span>
                     }
-
                 </div>
             </div>
 
@@ -231,7 +233,6 @@ function ActionBar() {
                     <IconButton className={styles.send} type='submit'>
                         <PaperPlaneRight />
                     </IconButton>
-
                     <div
                         ref={emojiPickerContainerRef}
                         className={generateClassName(styles, ['emoji-picker-container', ...!showEmojiPicker ? ['d-none'] : []])} style={{

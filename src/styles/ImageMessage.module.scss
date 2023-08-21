@@ -1,0 +1,17 @@
+.image-message-container {
+
+    & .image {
+        max-width: 23rem;
+        max-height: 23rem;
+    }
+
+    & .error-image-container {
+        display: flex;
+        align-items: center;
+    }
+
+    & .error-image {
+        max-width: 4rem;
+        max-height: 10rem;
+    }
+}

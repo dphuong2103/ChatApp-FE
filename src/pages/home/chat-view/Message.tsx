@@ -16,6 +16,8 @@ import UploadFileMessage from './UploadFileMessage';
 import DownloadFileMessage from './DownloadFileMessage';
 import CancelledFileMessage from './CancelledFileMessage';
 import FileIcon from '../../../components/FileIcon';
+import ImageMessage from './ImageMessage';
+import RepliedMessage from './RepliedMessage';
 function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
     const currentUserId = useAppSelector(state => state.auth.user?.id);
@@ -53,8 +55,6 @@ function Message({ message, onAvatarClick }: MessageProps) {
         }
     }
 
-    const repliedMessageText = useMemo(() => truncateMessageName(message), [message.replyToMessage?.messageText])
-
     return (
         <div className={generateClassName(styles, ['message-container', ...message.senderId === currentUserId ? ['right'] : []])}>
             <div className={generateClassName(styles, ['message-card', ...message.senderId === currentUserId ? ['right'] : []])}>
@@ -62,16 +62,13 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     message.senderId !== currentUserId && <Avatar name={message.sender.displayName} imgUrl={message.sender.photoUrl} onClick={onAvatarClick} />
                 }
                 <div className={styles['message-info']}>
+                    <ImageMessage message={message} />
                     <DownloadFileMessage message={message} />
                     <UploadFileMessage message={message} />
                     <CancelledFileMessage message={message} />
-                    <div className={generateClassName(styles, ['replied-message-container', ...message.replyToMessage ? [] : ['d-none']])}>
-                        <Typography component='span' variant='body2' fontWeight={500}>{message.replyToMessage?.sender.displayName}</Typography>
-                        {
-                            message.replyToMessage?.type === 'Files' && message.replyToMessage.fileName ? <FileIcon extension={message.replyToMessage.fileName.split('.').pop() ?? ''} style={{ width: '2.5rem', height: '2.5rem' }} /> :
-                                <div className={styles['replied-message']}>{repliedMessageText}</div>
-                        }
-                    </div>
+                    {
+                        message.replyToMessage && <RepliedMessage message={message.replyToMessage} />
+                    }
                     <Typography color='black' >{message.messageText}</Typography>
                     <span className={styles.time}>{messageTime(message.createdTime)}</span>
                 </div>
@@ -85,9 +82,9 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     <MoreHorizIcon />
                 </button>
             </div>
-            
+
             <MessageActionMenu anchorEl={messageMenuAnchorEl} onClose={handleOnCloseMessageMenu} copy={hanldeCopyToClipBoard} deleteMessage={handleDeleteMessage} />
-        
+
         </div>
     )
 }
@@ -99,6 +96,4 @@ type MessageProps = {
     onAvatarClick?: () => void
 }
 
-function truncateMessageName(message: TypeMessage) {
-    return (message.replyToMessage?.messageText && message.replyToMessage?.messageText?.length >= 100) ? `${message.replyToMessage?.messageText.substring(0, 100)}...` : message.replyToMessage?.messageText;
-}
+

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { MessageAPI } from '../../../api';
 import FileIcon from '../../../components/FileIcon';
 import Skeleton from '@mui/material/Skeleton';
-import { getExtensionFromName } from '../../../helper/getFileExtensionImage';
+import { getExtensionFromName, isImageFromFileName } from '../../../helper/getFileExtensionImage';
 function AfterEarlyReturn({ message }: { message: Message & { type: 'Files', fileStatus: 'Done' } }) {
     const [metaData, setMetaData] = useState<FullMetadata | null>(null)
     const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ function AfterEarlyReturn({ message }: { message: Message & { type: 'Files', fil
 }
 
 function DownloadFileMessage({ message }: DownloadFileMessageProps) {
-    if (message.type !== 'Files' || message.fileStatus !== 'Done') return;
+    if (message.type !== 'Files' || message.fileStatus !== 'Done' || isImageFromFileName(message.fileName)) return;
     return <AfterEarlyReturn message={message} />
 }
 

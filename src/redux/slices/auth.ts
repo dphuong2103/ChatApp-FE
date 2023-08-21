@@ -85,11 +85,11 @@ export function googleSignIn() {
   };
 }
 
-export function logOut() {
+export function logOut(showNotify?: boolean) {
   return async (dispatch: Dispatch) => {
     await firebaseLogOut();
     dispatch(authSlice.actions.logOut());
-    toast.info('Logged out successfully!');
+    showNotify && toast.info('Logged out successfully!');
   };
 }
 

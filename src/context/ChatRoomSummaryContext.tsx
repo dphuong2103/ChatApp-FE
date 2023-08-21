@@ -169,7 +169,6 @@ function handleUpdateCRSOnReceiveMessage(state: ChatRoomSummary[], message: Mess
         })
         return updatedChatRoomSummaries;
     }
-
     const updatedChatRoomSummaries = state.map(crs => {
         if (crs.chatRoom.id !== message.chatRoomId) return crs;
 
@@ -246,14 +245,14 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
 
     useEffect(() => {
         const abortController = new AbortController();
-        if (authState.user?.id) {
+        if (authState.user?.id || connection?.state === 'Connected') {
             getChatRoomSummaries();
             getUserRelationships();
             async function getChatRoomSummaries() {
                 setLoadingChatRoomSummary(true);
                 try {
                     const chatRoomSummariesResponse = await ChatRoomAPI.getUserChatRooms(abortController);
-                    if (chatRoomSummariesResponse != null && chatRoomSummariesResponse.data.length > 0) {
+                    if (chatRoomSummariesResponse?.data && chatRoomSummariesResponse.data.length > 0) {
                         dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.FIRSTGET, payload: chatRoomSummariesResponse.data })
                     }
                 } catch (err) {
@@ -265,7 +264,6 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
             };
 
             async function getUserRelationships() {
-
                 try {
                     const userRelationships = await UserRelationshipAPI.getUserRelationship(abortController);
                     if (userRelationships != null) {
@@ -281,8 +279,7 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
             abortController.abort();
         }
 
-    }, [authState.user?.id])
-
+    }, [authState.user?.id, connection?.state])
     useEffect(() => {
         if (!authState.isLoggedIn) {
             dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.DeleteAll })
@@ -290,12 +287,10 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
     }, [authState.isLoggedIn])
 
     useEffect(() => {
-        if (connection) {
-
+        if (connection?.state === 'Connected') {
             connection.on(ChatRoomSummaryConnectionFunction.RemoveUserFromGroupChat, (request: ChatRoomIdAndUserId) => {
                 dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.RemoveUserFromGroupChat, payload: request })
             })
-
 
             connection.on(ChatRoomSummaryConnectionFunction.AddMembersToChatRoom, (request: ChatRoomIdAndUsers) => {
                 dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.AddMembersToChatRoom, payload: request })
@@ -319,7 +314,7 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
 
         }
 
-    }, [connection])
+    }, [connection?.state])
 
     function handleUpsertRelationship(relationships: UserRelationship[], response: UserRelationship, type: 'Add' | 'Update' | 'Delete') {
         switch (type) {

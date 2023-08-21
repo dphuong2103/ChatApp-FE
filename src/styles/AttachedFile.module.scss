@@ -1,6 +1,11 @@
 .attached-file-container {
     position: relative;
 
+    & .images {
+        max-width: 4rem;
+        max-height: 4rem;
+    }
+
     & .btn.remove {
         border: none;
         background: none;

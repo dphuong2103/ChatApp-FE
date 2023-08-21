@@ -9,7 +9,7 @@ import { useAppSelector } from '../redux/store';
 export const CurrentChatRoomContext = createContext({} as showChatRoomContextProps);
 
 type MessagesActionAndPayloadType = {
-    type: MessagesActionType.FIRSTGET | MessagesActionType.GETLIST,
+    type: MessagesActionType.FIRSTGET | MessagesActionType.GETLIST | MessagesActionType.GetMissingMessages,
     payload: Message[],
 } | {
     type: MessagesActionType.UPSERTORDELETEMESSAGE,
@@ -31,13 +31,19 @@ const messageReducer = (state: Message[], action: MessagesActionAndPayloadType) 
         case MessagesActionType.UPSERTORDELETEMESSAGE: return handleUpsertOrDeleteMessage(state, action.payload);
         case MessagesActionType.GETLIST: return handleGetList(action.payload, state);
         case MessagesActionType.DELETEALL: return [];
-        case MessagesActionType.CancelUploadingMessageFile: return [...handleCancelUploadingMessageFile(action.payload, state)]
+        case MessagesActionType.CancelUploadingMessageFile: return [...handleCancelUploadingMessageFile(action.payload, state)];
+        case MessagesActionType.GetMissingMessages: return handleGetMissingMessages(action.payload, state);
     }
 }
 
 function handleGetList(payload: Message[], state: Message[]) {
     const updateNewMessages = handleTransFormMessages(payload);
     return [...updateNewMessages, ...state]
+}
+
+function handleGetMissingMessages(payload: Message[], state: Message[]) {
+    const updateNewMessages = handleTransFormMessages(payload);
+    return [...state, ...updateNewMessages];
 }
 
 function handleCancelUploadingMessageFile(messageId: string, state: Message[]) {
@@ -76,7 +82,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         await firstGetMessagesByChatRoomId(chatRoomSummary.chatRoom.id);
         dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen, payload: chatRoomSummary.chatRoom.id })
     }
-
 
     async function firstGetMessagesByChatRoomId(chatRoomId: string) {
         try {
@@ -152,21 +157,43 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     }, [messages])
 
     useEffect(() => {
-        if (connection) {
+        if (connection && !currentChatRoomSummary) {
             connection.on(ConnectionFunction.ReceivedMessage, (message: Message) => {
                 receivedMessage(message);
             })
         }
-    }, [connection])
 
-    useEffect(() => {
         if (connection && currentChatRoomSummary) {
             connection.off(ConnectionFunction.ReceivedMessage);
             connection.on(ConnectionFunction.ReceivedMessage, (message: Message) => {
                 receivedMessage(message);
             })
         }
-    }, [currentChatRoomSummary])
+
+    }, [currentChatRoomSummary, connection?.connectionId])
+
+    //Description: get messages when user reconnect;
+    useEffect(() => {
+        // console.log('new connection');
+        if (connection?.state === 'Connected' && currentChatRoomSummary) {
+            getMissingMessages();
+        }
+
+        async function getMissingMessages() {
+            if (messages.length > 0) {
+                try {
+                    var messagesResponse = await MessageAPI.getMissingMessages(messages[messages.length - 1].id);
+                    if (messagesResponse.data.length > 0) {
+                        dispatchMessage({ type: MessagesActionType.GetMissingMessages, payload: messagesResponse.data })
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                await firstGetMessagesByChatRoomId(currentChatRoomSummary!.chatRoom.id);
+            }
+        }
+    }, [connection?.state])
 
     useEffect(() => {
         setCurrentChatRoomSummary(prev => {

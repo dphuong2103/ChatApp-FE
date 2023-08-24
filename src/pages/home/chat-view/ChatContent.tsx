@@ -21,7 +21,6 @@ function ChatContent() {
   const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
   useEffect(() => {
     if (!isScrolling) {
-
       chatContentContainerRef.current?.scrollIntoView(
         {
           block: 'end',

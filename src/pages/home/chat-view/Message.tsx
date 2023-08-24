@@ -19,12 +19,14 @@ import ImageMessage from './ImageMessage';
 import RepliedMessage from './RepliedMessage';
 import UploadingAudioMessage from './UploadAudioMessage';
 import AudioMessage from './AudioMessage';
+import { isImageFromFileName } from '../../../helper/getFileExtensionImage';
+import ErrorMessageFile from './ErrorMessageFile';
 
 function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const { handleSetReplyToMessage } = useChatContext();
-    
+
     function handleMenuClick(e: React.MouseEvent<HTMLElement>) {
         setMessageMenuAnchorEl(e.currentTarget);
     }
@@ -65,11 +67,11 @@ function Message({ message, onAvatarClick }: MessageProps) {
                 }
                 <div className={styles['message-info']}>
                     {
-                        message.type === 'Files' && <ImageMessage message={message} />
+                        (message.type === 'Files' && message.fileStatus === 'Done' && isImageFromFileName(message.fileName)) && < ImageMessage message={message} />
                     }
 
                     {
-                        message.type === 'Files' && message.fileStatus === 'Done' && <DownloadFileMessage message={message} />
+                        message.type === 'Files' && message.fileStatus === 'Done' && !isImageFromFileName(message.fileName) && <DownloadFileMessage message={message} />
                     }
 
                     {
@@ -77,7 +79,9 @@ function Message({ message, onAvatarClick }: MessageProps) {
                         && <UploadFileMessage message={message} />
 
                     }
-                    <CancelledFileMessage message={message} />
+                    {
+                        message.type === 'Files' && message.fileStatus === 'Cancelled' && <CancelledFileMessage message={message} />
+                    }
                     {
                         message.type === 'AudioRecord' && message.fileStatus === 'InProgress' && <UploadingAudioMessage />
                     }
@@ -88,7 +92,9 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     {
                         message.replyToMessage && <RepliedMessage message={message.replyToMessage} />
                     }
-
+                    {
+                        (message.type === 'Files' || message.type === 'AudioRecord') && message.fileStatus === 'Error' && <ErrorMessageFile message={message} />
+                    }
                     <Typography color='black' >{message.messageText}</Typography>
                     <span className={styles.time}>{messageTime(message.createdTime)}</span>
                 </div>

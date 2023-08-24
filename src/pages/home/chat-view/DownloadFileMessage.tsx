@@ -7,9 +7,12 @@ import { MessageAPI } from '../../../api';
 import FileIcon from '../../../components/FileIcon';
 import Skeleton from '@mui/material/Skeleton';
 import { getExtensionFromName, isImageFromFileName } from '../../../helper/getFileExtensionImage';
-function AfterEarlyReturn({ message }: { message: Message & { type: 'Files', fileStatus: 'Done' } }) {
+
+function DownloadFileMessage({ message }: DownloadFileMessageProps) {
+    if (isImageFromFileName(message.fileName)) return;
     const [metaData, setMetaData] = useState<FullMetadata | null>(null)
     const [isLoading, setIsLoading] = useState(false);
+    
     useEffect(() => {
         getMetaData();
 
@@ -49,12 +52,10 @@ function AfterEarlyReturn({ message }: { message: Message & { type: 'Files', fil
     )
 }
 
-function DownloadFileMessage({ message }: DownloadFileMessageProps) {
-    if (message.type !== 'Files' || message.fileStatus !== 'Done' || isImageFromFileName(message.fileName)) return;
-    return <AfterEarlyReturn message={message} />
-}
-
 export default DownloadFileMessage
 type DownloadFileMessageProps = {
-    message: Message
+    message: Message & {
+        type: 'Files',
+        fileStatus: 'Done'
+    }
 }

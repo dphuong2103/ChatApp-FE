@@ -17,5 +17,8 @@ function CancelledFileMessage({ message }: CancelledFileMessageProps) {
 
 export default CancelledFileMessage
 type CancelledFileMessageProps = {
-    message: Message
+    message: Message & {
+        type: 'Files',
+        fileStatus: 'Cancelled'
+    }
 }

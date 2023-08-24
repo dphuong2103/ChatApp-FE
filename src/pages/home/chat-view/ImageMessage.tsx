@@ -5,7 +5,7 @@ import { useState } from 'react';
 import errorImg from '../../../assets/imgs/error-image.svg';
 function ImageMessage({ message }: ImageMessageProps) {
     const [error, setError] = useState<React.SyntheticEvent<HTMLImageElement, Event> | null>(null);
-    if (message.type !== 'Files' || message.fileStatus !== 'Done' || !isImageFromFileName(message.fileName)) return;
+    if (!isImageFromFileName(message.fileName)) return;
     return (
         <div className={styles['image-message-container']}>
             {
@@ -22,5 +22,8 @@ function ImageMessage({ message }: ImageMessageProps) {
 
 export default ImageMessage
 type ImageMessageProps = {
-    message: Message
+    message: Message & {
+        type: 'Files',
+        fileStatus: 'Done'
+    }
 }

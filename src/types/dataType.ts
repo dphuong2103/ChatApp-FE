@@ -133,7 +133,8 @@ export type Message = {
   fileUrls: string;
   fileName: string
 } | {
-  fileStatus: 'Error'
+  fileStatus: 'Error',
+  fileName: string
 }
   )
   ) | ({
@@ -146,6 +147,9 @@ export type Message = {
   } | {
     fileStatus: 'Done',
     fileUrls: string;
+  } | {
+    fileStatus: 'Error',
+    fileName: string
   })
   )
   )

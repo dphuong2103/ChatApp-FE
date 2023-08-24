@@ -4,6 +4,7 @@ import { recordingDuration } from '../../../helper/dateTime';
 import { PaperPlaneRight, Pause, Play, Record, X } from 'phosphor-react';
 import { IconButton, Typography } from '@mui/material';
 const maxDuration = (10 * 100)*60*4;
+
 function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps) {
     const [duration, setDuration] = useState(0);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -29,6 +30,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
         if (isRecording) {
             handleStartRecording();
         }
+
         async function handleStartRecording() {
 
             chunksRef.current = [];
@@ -67,6 +69,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
         }
         return () => {
             clearInterval(interval);
+            handleCancelRecording();
         }
     }, [isRecording])
 

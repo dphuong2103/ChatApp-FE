@@ -30,10 +30,11 @@ export default function HubConnection({ children }: ContextChildren) {
                     newConnection.on(ConnectionFunction.UpdateConnectionId, (connectionId: string) => { setConnectionId(connectionId) });
                     newConnection.onclose((e) => {
                         setConnection(null);
-                        toast.error('Cannot connect to the server, please login again');
+                        toast.error('Cannot connect to the server, please login later!');
                         console.warn("Connection closed:", e);
-                        dispatch(logOut());
                         setReconnecting(false);
+                        dispatch(closeLoadingSpinner());
+                        dispatch(logOut());
                     })
 
                     await newConnection.start().then(() => {
@@ -48,7 +49,7 @@ export default function HubConnection({ children }: ContextChildren) {
 
                     newConnection.onreconnecting(() => {
                         setReconnecting(true);
-                        console.log('reconnecting')
+                        console.info('reconnecting')
                         dispatch(showLoadingSpinner());
                     });
 

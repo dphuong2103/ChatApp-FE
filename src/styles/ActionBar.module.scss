@@ -93,11 +93,16 @@
             color: grey;
         }
 
-        & .image{
+        & .image {
             max-width: 2.5rem;
             max-height: 2.5rem;
         }
 
+        & .audio-message-container {
+            display: flex;
+            font-size: $text-sizes-text-regular-ss ;
+            gap: 0.5rem;
+        }
 
     }
 

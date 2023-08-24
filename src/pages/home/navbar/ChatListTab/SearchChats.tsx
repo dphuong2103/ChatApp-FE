@@ -31,7 +31,7 @@ function SearchChats() {
           var searchedUsersByEmail = await searchUserByEmail();
           filterAndSearchResults = removeDuplicateChat(filterAndSearchResults, searchedUsersByEmail);
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
 
       }

@@ -1,36 +1,62 @@
-import { StorageError, StorageReference, UploadTask, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { useEffect, useRef, useState } from 'react';
+import { getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { Message, UploadFileStatus, UploadTask as UploadTaskType } from '../types/dataType';
+import { chatRoomFileRef } from '../firebase-config';
+import { MessageAPI } from '../api';
 
-type UploadStatus = {
-    progress: number,
-    error?: StorageError | null,
-    downloadUrl?: string | null,
-    uploadRef?: React.MutableRefObject<UploadTask | null>
-}
+export function uploadFileTask(message: (Message & ({
+    type: 'Files',
+    fileStatus: 'InProgress',
+} | {
+    type: 'AudioRecord',
+    fileStatus: 'InProgress',
+})), onFinish?: () => void
+): UploadTaskType {
+    let observers: ((uploadStatus: UploadFileStatus) => void)[] = [];
+    const storageRef = chatRoomFileRef(message.chatRoomId, message.id);
+    const uploadTask = message.type === 'Files' ? uploadBytesResumable(storageRef, message.files) : uploadBytesResumable(storageRef, message.audio);
+    let uploadStatus: UploadFileStatus = { progress: 0 };
 
-
-export const useUploadFiles = (storageRef: StorageReference, file: File | null) => {
-    const [uploadStatus, setUploadStatus] = useState<UploadStatus>({ progress: 0 });
-    if (!file) return null;
-    const uploadRef = useRef<UploadTask | null>(null);
-    useEffect(() => {
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        uploadTask.on('state_changed', (snapshot) => {
-            const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            setUploadStatus((prevStatus) => { return { ...prevStatus, progress: prog } });
-        },
-            (error) => setUploadStatus((prevStatus) => { return { ...prevStatus, error: error } }),
-            async () => {
-                var downloadUrl = await getDownloadURL(uploadTask.snapshot.ref)
-                setUploadStatus((prevStatus) => { return { ...prevStatus, downloadUrl: downloadUrl } })
-            }
-        );
-        uploadRef.current = uploadTask;
-        uploadStatus.uploadRef = uploadRef;
-        return () => {
-            uploadTask.cancel()
+    async function handleUpdateMessageOnFileUploadFinish(downloadUrl: string) {
+        try {
+            await MessageAPI.updateMessageOnFileUploadFinish(message.id, downloadUrl!);
+        } catch (err) {
+            console.error(err);
         }
-    }, [])
+    }
 
-    return uploadStatus;
+    uploadTask.on('state_changed', (snapshot) => {
+        const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        if (prog === 100) {
+            onFinish && onFinish();
+        }
+        uploadStatus = { ...uploadStatus, progress: prog }
+        for (let observer of observers) {
+            observer(uploadStatus);
+        }
+    },
+        (error) => {
+            uploadStatus = { ...uploadStatus, error: error }
+            for (let observer of observers) {
+                observer(uploadStatus);
+            }
+        },
+        async () => {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            handleUpdateMessageOnFileUploadFinish(downloadUrl);
+        });
+
+    const subscribe = (callback: (uploadStatus: UploadFileStatus) => void) => {
+        observers.push(callback);
+        return () => {
+            observers = observers.filter(cb => cb !== callback)
+        }
+    }
+
+    const cancelTask = () => { uploadTask.cancel() };
+    return {
+        messageId: message.id,
+        cancelTask,
+        subscribe,
+        file: message.type === 'Files' ? message.files : message.audio
+    }
 }

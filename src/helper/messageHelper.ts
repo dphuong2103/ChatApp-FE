@@ -1,4 +1,5 @@
-import { Message } from '../types/dataType';
+import { MessageAPI } from '../api';
+import { Message, UploadTask } from '../types/dataType';
 
 export function sortMessages(messages: Message[]): Message[] {
     return messages.sort((a, b) => {
@@ -19,8 +20,7 @@ export function handleGetRepliedMessages(messages: Message[]) {
 
 export function handleUpsertOrDeleteMessage(state: Message[], payload: Message) {
     if (payload.isDeleted) {
-        state = state.filter(message => message.id !== payload.id);
-        return state;
+        return [...state].filter(message => message.id !== payload.id);
     }
     let messageExists = false;
     payload = handleGetRepliedMessage(payload, state);
@@ -38,7 +38,6 @@ export function handleUpsertOrDeleteMessage(state: Message[], payload: Message) 
     else {
         return updatedState;
     }
-
 }
 
 export function handleTransFormMessages(messages: Message[]) {
@@ -55,4 +54,24 @@ export function handleGetRepliedMessage(originalMessage: Message, messages: Mess
         }
     }
     return originalMessage;
+}
+
+export function handleGetMessageUploadTask(message: Message, uploadTasks: UploadTask[]): Message {
+    if (message.type !== 'Files') return message;
+    if (message.fileStatus === 'InProgress') {
+        if (uploadTasks.length === 0) {
+            MessageAPI.uploadFileMessageError(message.id);
+            message = { ...message, fileStatus: 'Error' }
+            return message;
+        }
+        const uploadTask = uploadTasks.find(ut => ut.messageId === message.id);
+        if (!uploadTask) {
+            MessageAPI.uploadFileMessageError(message.id);
+            message = { ...message, fileStatus: 'Error' }
+        } else {
+            message.uploadTask = uploadTask;
+        }
+    }
+
+    return message;
 }

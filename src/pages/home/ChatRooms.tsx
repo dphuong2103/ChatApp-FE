@@ -23,6 +23,7 @@ function ChatRooms() {
                     onClick={handleOnClickChatRoom}
                     isSelected={currentChatRoomSummary?.chatRoom.id === chatRoomSummary.chatRoom.id} />)
             }
+        
         </div>
     )
 }

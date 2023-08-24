@@ -1,9 +1,9 @@
 import { IconButton, Typography } from '@mui/material'
 import styles from '../../../styles/ActionBar.module.scss'
-import { PaperPlaneRight, Paperclip, Smiley, } from 'phosphor-react'
+import { Microphone, PaperPlaneRight, Paperclip, Smiley, } from 'phosphor-react'
 import { useEffect, useRef, useState } from 'react';
 import { ChatRoomAPI, MessageAPI } from '../../../api';
-import { ChatRoomType, MessagesActionType, NewChatRoomAndUserList, NewMessage, NewMessageForFieldUpload } from '../../../types/dataType';
+import { ChatRoomType, NewChatRoomAndUserList, NewMessage, NewMessageForAudioRecord, NewMessageForFileUpload } from '../../../types/dataType';
 import { useChatContext, useCurrentChatRoomContext } from '../../../helper/getContext';
 import { useAppSelector } from '../../../redux/store';
 import { useOutsideClick } from '../../../hooks/useClickOutside';
@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import AttachedFiles from './AttachedFiles';
 import FileIcon from '../../../components/FileIcon';
 import { getExtensionFromName, isImageFromFileName } from '../../../helper/getFileExtensionImage';
+import RecordAudio from './RecordAudio';
 
 const maxHeight = 100;
 const maxFileSizeMb = 8;
@@ -25,13 +26,14 @@ function ActionBar() {
     const navigate = useNavigate();
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
     const formRef = useRef<HTMLFormElement>(null);
-    const { currentChatRoomSummary, newChat, currentChatRoomInfo, handleSetCurrentChatRoomSummary, dispatchMessage } = useCurrentChatRoomContext();
+    const { handleAddMessageForFileUpload, currentChatRoomSummary, newChat, currentChatRoomInfo, handleSetCurrentChatRoomSummary } = useCurrentChatRoomContext();
     const messageInputRef = useRef<HTMLTextAreaElement>(null);
     const { handleSetReplyToMessage, replyToMessage } = useChatContext();
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const iconButtonRef = useRef<HTMLButtonElement>(null);
     const attachFileRef = useRef<HTMLInputElement | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isRecording, setIsRecording] = useState(false);
 
     function handleOnTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
         setTextInput(e.target.value);
@@ -92,7 +94,7 @@ function ActionBar() {
     async function handleSendPlainMessage() {
         if (textInput === '') return;
         const trimText = textInput.trim();
-        if (!currentUserId && !currentChatRoomSummary?.chatRoom) {
+        if (!currentUserId || !currentChatRoomSummary?.chatRoom) {
             console.error('userId and chatroom is null');
             return;
         }
@@ -114,7 +116,7 @@ function ActionBar() {
 
     async function handleSendMessageWithFiles() {
         const trimText = textInput.trim();
-        const newMessage: NewMessageForFieldUpload = {
+        const newMessage: NewMessageForFileUpload = {
             chatRoomId: currentChatRoomSummary!.chatRoom.id,
             messageText: trimText,
             senderId: currentUserId!,
@@ -125,10 +127,10 @@ function ActionBar() {
             const message = (await MessageAPI.addNewMessageForFileUpload(newMessage)).data;
             if (message.type === 'Files' && message.fileStatus === 'InProgress') {
                 message.files = selectedFile!;
-                dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
-                setTextInput('');
-                setSelectedFile(null);
+                handleAddMessageForFileUpload(message)
             }
+            setTextInput('');
+            setSelectedFile(null);
         } catch (err) {
             console.error(err)
         }
@@ -161,6 +163,34 @@ function ActionBar() {
 
     function handleDeselectFile() {
         setSelectedFile(null);
+    }
+
+    function startRecording() {
+        setIsRecording(true)
+    }
+
+    function stopRecording() {
+        setIsRecording(false);
+    }
+
+    async function handleSendAudioRecord(audio: Blob) {
+        if (!currentUserId || !currentChatRoomSummary?.chatRoom) {
+            console.error('userId and chatroom is null');
+            return;
+        }
+        try {
+            const newMessage: NewMessageForAudioRecord = {
+                senderId: currentUserId,
+                chatRoomId: currentChatRoomSummary.chatRoom.id
+            }
+            let message = (await MessageAPI.addNewMessageForAudioRecord(newMessage)).data;
+            if (message.type === 'AudioRecord' && message.fileStatus === 'InProgress') {
+                message.audio = audio;
+                handleAddMessageForFileUpload(message);
+            }
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     useEffect(() => {
@@ -199,7 +229,12 @@ function ActionBar() {
     useEffect(() => {
         setTextInput('')
         setSelectedFile(null);
+        setIsRecording(false);
     }, [newChat, currentChatRoomSummary])
+
+    if (isRecording) {
+        return <RecordAudio isRecording={isRecording} stopRecording={stopRecording} onSubmit={handleSendAudioRecord} />
+    }
 
     return (
         <form className={styles['action-bar-form']} onSubmit={handleSubmitMessage} ref={formRef}>
@@ -210,12 +245,24 @@ function ActionBar() {
                     </button>
                     <Typography variant='body2' component='span' fontWeight='500'>Reply: {replyToMessage?.senderId !== currentUserId ? replyToMessage?.sender.displayName : ''}</Typography>
                     {
-                        (replyToMessage?.type === 'Files' && replyToMessage.fileName && replyToMessage.fileStatus === 'Done') ? <>
+                        (replyToMessage?.type === 'Files' && replyToMessage.fileStatus === 'Done' && replyToMessage.fileName) && <>
                             {
                                 isImageFromFileName(replyToMessage.fileName) ? <img src={replyToMessage.fileUrls} className={styles.image} /> : <FileIcon extension={getExtensionFromName(replyToMessage.fileName)} style={{ width: '3rem', height: '3rem' }} />
                             }
 
-                        </> : <span className={styles['reply-message-text']}>{replyToMessage?.messageText}</span>
+                        </>
+                    }
+
+
+                    {
+                        replyToMessage?.type === 'AudioRecord' && replyToMessage.fileStatus === 'Done' && <div className={styles['audio-message-container']}>
+                            <Microphone size={20} />
+                            <span>Audio message</span>
+                        </div>
+                    }
+
+                    {
+                        replyToMessage?.type === 'PlainText' && <span className={styles['reply-message-text']}>{replyToMessage?.messageText}</span>
                     }
                 </div>
             </div>
@@ -226,9 +273,14 @@ function ActionBar() {
                     <IconButton type='button' ref={iconButtonRef} onClick={handleClickShowEmoji} >
                         <Smiley />
                     </IconButton>
-                    <IconButton onClick={() => attachFileRef.current?.click()}>
+                    <IconButton type='button' onClick={startRecording}>
+                        <Microphone size={24} />
+                    </IconButton>
+
+                    <IconButton onClick={() => attachFileRef.current?.click()} type='button'>
                         <Paperclip size={24} />
                     </IconButton>
+
                     <input type='file' style={{ display: 'none' }} ref={attachFileRef} onChange={handleSelectFile} />
                     <IconButton className={styles.send} type='submit'>
                         <PaperPlaneRight />
@@ -247,8 +299,8 @@ function ActionBar() {
                 selectedFile && <AttachedFiles file={selectedFile} onFileDeselect={handleDeselectFile} />
             }
         </form >
+
     )
 }
 
 export default ActionBar
-

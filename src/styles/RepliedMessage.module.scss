@@ -1,4 +1,5 @@
 @import './global.scss';
+@import './variables.scss';
 
 .replied-message-container {
     overflow: hidden;
@@ -28,6 +29,12 @@
         background: #3989ff;
         position: absolute;
         left: 0px;
+    }
+
+    & .audio-message-container {
+        display: flex;
+        font-size: $text-sizes-text-regular-ss;
+        gap: 0.5rem;
     }
 
     &.d-none {

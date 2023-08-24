@@ -10,8 +10,6 @@ function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProp
   const { newChat, handleSetCurrentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
   const currentUser = useAppSelector(state => state.auth.user);
 
-
-
   async function handleSendFriendRequest() {
     if (!currentUser || !targetUser?.id) return;
     if (newChat) {

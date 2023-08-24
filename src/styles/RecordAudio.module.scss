@@ -1,0 +1,49 @@
+.record-audio-container {
+    display: flex;
+    padding: 0.5rem 1rem;
+    align-items: center;
+    border-top: 1px solid lightgray;
+    justify-content: center;
+
+    & .content-container {
+        background: #ebebeb;
+        display: flex;
+        gap: 0.5rem;
+        padding: 0rem 0rem 0rem 1rem;
+        justify-content: space-between;
+        align-items: center;
+        flex: 1;
+        border-radius: 20px;
+    }
+
+    & .title-container {
+        display: flex;
+        gap: 1rem;
+        animation: title-animation;
+        animation-duration: 3s;
+        animation-iteration-count: infinite;
+    }
+
+}
+
+@keyframes title-animation {
+    0% {
+        opacity: 25%
+    }
+
+    25% {
+        opacity: 50%
+    }
+
+    50% {
+        opacity: 75%
+    }
+
+    75% {
+        opacity: 100%
+    }
+
+    100% {
+        opacity: 0%
+    }
+}

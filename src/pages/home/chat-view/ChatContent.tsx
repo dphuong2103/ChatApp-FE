@@ -66,7 +66,6 @@ function ChatContent() {
 
   function handleAvatarSelect(user: User) {
     if (!currentUser) return;
-
     const relationship = getRelationship(currentUser, user.id, relationships);
     setSelectedUserWithRelationship({ relationship: relationship ?? undefined, user: user });
     setOpenUserInfoModal(true);

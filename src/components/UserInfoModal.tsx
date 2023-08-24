@@ -23,7 +23,7 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
         getUser();
 
         async function getUser() {
-            if (userId) {
+            if (userId && open) {
                 try {
                     var user = (await UserAPI.getUserById(userId)).data;
                     setUser(user)
@@ -33,7 +33,7 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
                 }
             }
         }
-    }, [userId])
+    }, [userId, open])
 
 
     async function handleSendFriendRequest() {
@@ -72,7 +72,6 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
         handleSetCurrentChatRoomSummary(chatRoomAndUserList);
         onClose();
     }
-
     async function handleDeleteFriend() {
         if (!currentChatRoomInfo?.relationship) return;
         try {
@@ -81,7 +80,7 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
             toast.info('Friend deleted successfully');
         } catch (err) {
             toast.error('Cannot delete friend, please try again later!');
-            console.log(err)
+            console.error(err)
         }
     }
 
@@ -137,7 +136,11 @@ function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalPro
                     <div className={styles['personal-info']}>
                         <div className={styles['info-container']}>
                             <div className={styles['info-title']}>Gender: </div>
-                            <div>Male</div>
+                            <div>{user?.gender}</div>
+                        </div>
+                        <div className={styles['info-container']}>
+                            <div className={styles['info-title']}>Email: </div>
+                            <div>{user?.email}</div>
                         </div>
                         <div className={styles['info-container']}>
                             <div className={styles['info-title']}>Date of birth: </div>

@@ -1,3 +1,5 @@
+import { StorageError } from 'firebase/storage';
+
 export const Gender = {
   male: 'Male',
   female: 'Female',
@@ -121,7 +123,8 @@ export type Message = {
 } & ({
   fileStatus: 'InProgress',
   files: File,
-  fileName: string
+  fileName: string,
+  uploadTask?: UploadTask
 } | {
   fileStatus: 'Cancelled',
   fileName: string
@@ -129,15 +132,30 @@ export type Message = {
   fileStatus: 'Done',
   fileUrls: string;
   fileName: string
+} | {
+  fileStatus: 'Error'
 }
   )
+  ) | ({
+    type: 'AudioRecord'
+  } & ({
+    fileStatus: 'InProgress',
+    audio: Blob,
+    uploadTask?: UploadTask
+
+  } | {
+    fileStatus: 'Done',
+    fileUrls: string;
+  })
   )
   )
 
 export type NewMessage = Pick<Message, 'senderId' | 'chatRoomId' | 'replyToMessageId' | 'messageText'>
-export type NewMessageForFieldUpload = Pick<Message & {
+export type NewMessageForFileUpload = Pick<Message & {
   fileName: string
 }, 'senderId' | 'chatRoomId' | 'replyToMessageId' | 'messageText' | 'fileName'>
+
+export type NewMessageForAudioRecord = Pick<Message, 'senderId' | 'chatRoomId'>;
 
 export type MessageRead = {
   messageId: string;
@@ -241,4 +259,16 @@ export type Friend = {
 export type UserWithRelationship = {
   user: User,
   relationship?: UserRelationship
+}
+
+export type UploadTask = {
+  messageId: string,
+  cancelTask: () => void,
+  subscribe: (callback: (uploadStatus: UploadFileStatus) => void) => () => void,
+  file: File | Blob
+}
+
+export type UploadFileStatus = {
+  progress: number,
+  error?: StorageError | null,
 }

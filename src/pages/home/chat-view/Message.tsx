@@ -7,7 +7,7 @@ import { messageTime } from '../../../helper/dateTime';
 import Avatar from '../../../components/Avatar';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import MessageActionMenu from './MessageActionMenu';
 import { MessageAPI } from '../../../api';
@@ -15,14 +15,16 @@ import { useChatContext } from '../../../helper/getContext';
 import UploadFileMessage from './UploadFileMessage';
 import DownloadFileMessage from './DownloadFileMessage';
 import CancelledFileMessage from './CancelledFileMessage';
-import FileIcon from '../../../components/FileIcon';
 import ImageMessage from './ImageMessage';
 import RepliedMessage from './RepliedMessage';
+import UploadingAudioMessage from './UploadAudioMessage';
+import AudioMessage from './AudioMessage';
+
 function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
     const currentUserId = useAppSelector(state => state.auth.user?.id);
     const { handleSetReplyToMessage } = useChatContext();
-
+    
     function handleMenuClick(e: React.MouseEvent<HTMLElement>) {
         setMessageMenuAnchorEl(e.currentTarget);
     }
@@ -62,13 +64,31 @@ function Message({ message, onAvatarClick }: MessageProps) {
                     message.senderId !== currentUserId && <Avatar name={message.sender.displayName} imgUrl={message.sender.photoUrl} onClick={onAvatarClick} />
                 }
                 <div className={styles['message-info']}>
-                    <ImageMessage message={message} />
-                    <DownloadFileMessage message={message} />
-                    <UploadFileMessage message={message} />
+                    {
+                        message.type === 'Files' && <ImageMessage message={message} />
+                    }
+
+                    {
+                        message.type === 'Files' && message.fileStatus === 'Done' && <DownloadFileMessage message={message} />
+                    }
+
+                    {
+                        message.type === 'Files' && message.fileStatus === 'InProgress'
+                        && <UploadFileMessage message={message} />
+
+                    }
                     <CancelledFileMessage message={message} />
+                    {
+                        message.type === 'AudioRecord' && message.fileStatus === 'InProgress' && <UploadingAudioMessage />
+                    }
+
+                    {
+                        message.type === 'AudioRecord' && message.fileStatus === 'Done' && <AudioMessage message={message} />
+                    }
                     {
                         message.replyToMessage && <RepliedMessage message={message.replyToMessage} />
                     }
+
                     <Typography color='black' >{message.messageText}</Typography>
                     <span className={styles.time}>{messageTime(message.createdTime)}</span>
                 </div>

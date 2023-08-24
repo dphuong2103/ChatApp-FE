@@ -1,10 +1,11 @@
 import { createContext, useEffect, useReducer, useState } from 'react';
-import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UpdateLastMessageRead, User } from '../types/dataType';
+import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UpdateLastMessageRead, UploadTask, User } from '../types/dataType';
 import { useChatRoomSummaryContext, useHubConnection } from '../helper/getContext';
 import { MessageAPI, UserChatRoomAPI } from '../api';
-import { handleTransFormMessages, handleUpsertOrDeleteMessage } from '../helper/messageHelper';
+import { handleGetMessageUploadTask, handleTransFormMessages, handleUpsertOrDeleteMessage } from '../helper/messageHelper';
 import { getChatRoomInfo } from '../helper/chatRoomHelper';
 import { useAppSelector } from '../redux/store';
+import { uploadFileTask } from '../hooks/useUploadFile';
 
 export const CurrentChatRoomContext = createContext({} as showChatRoomContextProps);
 
@@ -20,6 +21,7 @@ type MessagesActionAndPayloadType = {
     type: MessagesActionType.CancelUploadingMessageFile,
     payload: string
 }
+
 const messageReducer = (state: Message[], action: MessagesActionAndPayloadType) => {
     switch (action.type) {
         case MessagesActionType.FIRSTGET:
@@ -64,6 +66,8 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     const { dispatchChatRoomSummary, chatRoomSummaries, relationships } = useChatRoomSummaryContext();
     const [currentChatRoomInfo, setCurrentChatRoomInfo] = useState<ChatRoomInfo | null>(null);
     const [newChat, setNewChat] = useState<NewChat | null>(null);
+    const [uploadTasks, setUploadTasks] = useState<UploadTask[]>([]);
+
     const currentUser = useAppSelector(state => state.auth.user);
 
     async function handleSetCurrentChatRoomSummary(chatRoomSummary: ChatRoomSummary, newChatRoom?: boolean) {
@@ -85,8 +89,13 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
 
     async function firstGetMessagesByChatRoomId(chatRoomId: string) {
         try {
-            var messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(chatRoomId, 30);
-            dispatchMessage({ type: MessagesActionType.FIRSTGET, payload: messagesResponse.data });
+            const messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(chatRoomId, 30);
+            let messagesData = messagesResponse.data;
+            if (!(uploadTasks.length === 0)) {
+                messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
+            }
+
+            dispatchMessage({ type: MessagesActionType.FIRSTGET, payload: messagesData });
         } catch (err) {
             console.error(err);
         }
@@ -95,8 +104,10 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     async function getMessagesPageByChatRoomId() {
         if (!messages || !currentChatRoomSummary) return;
         try {
-            var messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(currentChatRoomSummary.chatRoom.id, 30, messages[0].id);
-            dispatchMessage({ type: MessagesActionType.GETLIST, payload: messagesResponse.data })
+            const messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(currentChatRoomSummary.chatRoom.id, 30, messages[0].id);
+            let messagesData = messagesResponse.data;
+            messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
+            dispatchMessage({ type: MessagesActionType.GETLIST, payload: messagesData })
         } catch (err) {
             console.error(err);
         }
@@ -106,7 +117,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         if (message.chatRoomId === currentChatRoomSummary?.chatRoom.id) {
             dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
         }
-
         dispatchChatRoomSummary({
             type: ChatRoomSummaryActionType.UpdateChatRoomSMROnReceiveMessage, payload: {
                 message: message,
@@ -127,6 +137,31 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
             partners: [user],
             relationshipStatus: 'NotFriend'
         });
+    }
+
+    function handleAddMessageForFileUpload(message: Message & ({
+        type: 'Files',
+        fileStatus: 'InProgress'
+    } | {
+        type: 'AudioRecord',
+        fileStatus: 'InProgress'
+    }
+    )) {
+        console.log(messages);
+        if ((message.type === 'Files') && message.fileStatus === 'InProgress') {
+            const uploadTask = uploadFileTask(message, () => {
+                setUploadTasks(prev => [...prev].filter(ut => ut !== uploadTask))
+            });
+            message.uploadTask = uploadTask;
+            setUploadTasks(prev => [...prev, uploadTask]);
+            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
+        }
+        else if ((message.type === 'AudioRecord') && message.fileStatus === 'InProgress') {
+            const uploadTask = uploadFileTask(message);
+            message.uploadTask = uploadTask;
+            setUploadTasks(prev => [...prev, uploadTask]);
+            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
+        }
     }
 
     useEffect(() => {
@@ -174,7 +209,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
 
     //Description: get messages when user reconnect;
     useEffect(() => {
-        // console.log('new connection');
         if (connection?.state === 'Connected' && currentChatRoomSummary) {
             getMissingMessages();
         }
@@ -182,9 +216,11 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         async function getMissingMessages() {
             if (messages.length > 0) {
                 try {
-                    var messagesResponse = await MessageAPI.getMissingMessages(messages[messages.length - 1].id);
+                    const messagesResponse = await MessageAPI.getMissingMessages(messages[messages.length - 1].id);
                     if (messagesResponse.data.length > 0) {
-                        dispatchMessage({ type: MessagesActionType.GetMissingMessages, payload: messagesResponse.data })
+                        let messagesData = messagesResponse.data;
+                        messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
+                        dispatchMessage({ type: MessagesActionType.GetMissingMessages, payload: messagesData })
                     }
                 } catch (err) {
                     console.error(err);
@@ -204,7 +240,8 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
 
     return (
         <CurrentChatRoomContext.Provider value={{
-            showChatRoom, setShowChatRoom, currentChatRoomSummary, handleSetCurrentChatRoomSummary, messages, dispatchMessage, getMessagesPageByChatRoomId, currentChatRoomInfo, newChat, handleNewChatSelect
+            showChatRoom, setShowChatRoom, currentChatRoomSummary, handleSetCurrentChatRoomSummary, messages, dispatchMessage, getMessagesPageByChatRoomId, currentChatRoomInfo, newChat, handleNewChatSelect,
+            handleAddMessageForFileUpload
         }}>{children}</CurrentChatRoomContext.Provider>
     )
 }
@@ -219,5 +256,13 @@ type showChatRoomContextProps = {
     getMessagesPageByChatRoomId: () => Promise<void>;
     currentChatRoomInfo: ChatRoomInfo | null;
     newChat: NewChat | null;
-    handleNewChatSelect: (user: User) => void
+    handleNewChatSelect: (user: User) => void;
+    handleAddMessageForFileUpload: (message: Message & ({
+        type: 'Files',
+        fileStatus: 'InProgress'
+    } | {
+        type: 'AudioRecord',
+        fileStatus: 'InProgress'
+    }
+    )) => void
 }

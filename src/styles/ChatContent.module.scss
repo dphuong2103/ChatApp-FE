@@ -16,7 +16,6 @@
 .btn-to-bottom-container {
     position: absolute;
     bottom: 2rem;
-    right: 2rem;
     width: 2rem;
     height: 2rem;
     width: 100%;
@@ -29,10 +28,10 @@
 
     & .btn-to-bottom {
         position: relative;
-        animation: btn-to-bottom;
         background-color: white;
         height: 2rem;
         aspect-ratio: 1;
+        animation: btn-to-bottom;
         animation-duration: 2s;
         animation-iteration-count: infinite;
         width: 2.5rem;

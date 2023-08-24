@@ -100,7 +100,6 @@ export default function Call({ children }: ContextChildren) {
             peer.current?.signal(callerData.signalData);
             dispatchCallStatus({ type: CallActionType.ONCALLSTATE });
         }
-
     }
 
     async function acceptCall() {

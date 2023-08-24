@@ -1,7 +1,7 @@
 import { myAxios } from '.';
-import { Message, NewMessage, NewMessageForFieldUpload } from '../types/dataType';
+import { Message, NewMessage, NewMessageForAudioRecord, NewMessageForFileUpload } from '../types/dataType';
 import { chatRoomFileRef } from '../firebase-config';
-import { getMetadata } from 'firebase/storage';
+import { StorageReference, getBlob, getMetadata } from 'firebase/storage';
 const API_URL_MESSAGE = '/api/messages';
 
 const MessageAPI = {
@@ -19,7 +19,7 @@ const MessageAPI = {
         const url = `${API_URL_MESSAGE}/delete/${messageId}`;
         return myAxios().put<Message | null>(url);
     },
-    addNewMessageForFileUpload: function (request: NewMessageForFieldUpload) {
+    addNewMessageForFileUpload: function (request: NewMessageForFileUpload) {
         const url = `${API_URL_MESSAGE}/newfileupload`;
         return myAxios().post<Message>(url, JSON.stringify(request));
     },
@@ -37,6 +37,15 @@ const MessageAPI = {
     },
     getMissingMessages(lastMessageId: string) {
         return myAxios().get<Message[]>(`${API_URL_MESSAGE}/${lastMessageId}/getmissingmessages`);
+    },
+    addNewMessageForAudioRecord: function (request: NewMessageForAudioRecord) {
+        return myAxios().post<Message>(`${API_URL_MESSAGE}/addnewmessageforaudiorecord`, JSON.stringify(request));
+    },
+    getAudioBlob: function (storageRef: StorageReference) {
+        return getBlob(storageRef);
+    },
+    uploadFileMessageError: function (messageId: string) {
+        return myAxios().put<Message>(`${API_URL_MESSAGE}/${messageId}/uploadfilemessageerror`)
     }
 }
 export default MessageAPI;

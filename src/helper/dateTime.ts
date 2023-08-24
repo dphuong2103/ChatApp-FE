@@ -17,7 +17,8 @@ export function latestMessageTime(request: Date) {
     else return format(messageDate, dateFormat);
 }
 
-export function messageTime(request: Date) {
+export function
+    messageTime(request: Date) {
     let date = request.toString();
     if (request.toString().charAt(request.toString().length - 1).toLowerCase() !== 'z') {
         date = `${request.toString()}Z`;
@@ -42,4 +43,19 @@ export function formatDateFromString(dateString?: string | null) {
     if (!dateString) return;
     const date = new Date(dateString);
     return format(date, dateFormat);
+}
+
+export function recordingDuration(time: number) {
+    time = Math.floor(time);
+    if (time < 10) {
+        return `00:0${time}`
+    }
+    if (time < 60) {
+        return `00:${time}`
+    }
+    const minutes = Math.floor(time / 60);
+    const remaningSeconds = time - minutes * 60;
+    const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    const secondString = remaningSeconds < 10 ? `0${remaningSeconds}` : `${remaningSeconds}`;
+    return `${minuteString}:${secondString}`
 }

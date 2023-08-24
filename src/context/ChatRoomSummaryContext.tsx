@@ -280,6 +280,7 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
         }
 
     }, [authState.user?.id, connection?.state])
+
     useEffect(() => {
         if (!authState.isLoggedIn) {
             dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.DeleteAll })

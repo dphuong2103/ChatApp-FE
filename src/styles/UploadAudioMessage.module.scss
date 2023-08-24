@@ -1,0 +1,15 @@
+.uploading-audio-message-container {
+    display: flex;
+
+    & .spinner-btn {
+        width: 4rem;
+        height: 4rem;
+        border: none;
+        background: none;
+
+        & .spinner {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}

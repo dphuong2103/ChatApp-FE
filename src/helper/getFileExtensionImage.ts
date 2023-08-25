@@ -55,4 +55,9 @@ export function isImageFromFileName(name: string) {
     return imagesExtension.includes(getExtensionFromName(name));
 }
 
+export function isVideoFromFileName(name: string) {
+    const extension = name.split('.').pop();
+    return extension && extension.toLowerCase() === 'mp4';
+}
+
 const imagesExtension = ['jpg', 'png', 'svg']

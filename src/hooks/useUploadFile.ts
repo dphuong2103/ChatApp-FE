@@ -13,7 +13,7 @@ export function uploadFileTask(message: (Message & ({
 ): UploadTaskType {
     let observers: ((uploadStatus: UploadFileStatus) => void)[] = [];
     const storageRef = chatRoomFileRef(message.chatRoomId, message.id);
-    const uploadTask = message.type === 'Files' ? uploadBytesResumable(storageRef, message.files) : uploadBytesResumable(storageRef, message.audio);
+    const uploadTask = message.type === 'Files' ? uploadBytesResumable(storageRef, message.files) : uploadBytesResumable(storageRef, message.audio,);
     let uploadStatus: UploadFileStatus = { progress: 0 };
 
     async function handleUpdateMessageOnFileUploadFinish(downloadUrl: string) {

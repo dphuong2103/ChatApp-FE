@@ -229,6 +229,7 @@ function ActionBar() {
     function handleOnPasteCapture(e: React.ClipboardEvent<HTMLTextAreaElement>) {
         if (e.clipboardData.files.length > 0) {
             setSelectedFile(e.clipboardData.files[0])
+            console.log(e.clipboardData.files[0])
         }
     }
 

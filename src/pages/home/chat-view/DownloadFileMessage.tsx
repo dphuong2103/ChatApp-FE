@@ -12,7 +12,8 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
     if (isImageFromFileName(message.fileName)) return;
     const [metaData, setMetaData] = useState<FullMetadata | null>(null)
     const [isLoading, setIsLoading] = useState(false);
-    
+    const [error, setError] = useState(false);
+
     useEffect(() => {
         getMetaData();
 
@@ -23,7 +24,7 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
                     var metaData = await MessageAPI.getMessageFileMetaData(message.chatRoomId, message.id);
                     setMetaData(metaData);
                 } catch (err) {
-                    console.error('Error getting metadata: ', err);
+                    setError(true);
                 } finally {
                     setIsLoading(false);
                 }

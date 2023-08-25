@@ -12,15 +12,9 @@ import { toast } from 'react-toastify';
 import MessageActionMenu from './MessageActionMenu';
 import { MessageAPI } from '../../../api';
 import { useChatContext } from '../../../helper/getContext';
-import UploadFileMessage from './UploadFileMessage';
-import DownloadFileMessage from './DownloadFileMessage';
-import CancelledFileMessage from './CancelledFileMessage';
-import ImageMessage from './ImageMessage';
-import RepliedMessage from './RepliedMessage';
-import UploadingAudioMessage from './UploadAudioMessage';
-import AudioMessage from './AudioMessage';
-import { isImageFromFileName } from '../../../helper/getFileExtensionImage';
-import ErrorMessageFile from './ErrorMessageFile';
+import MessageFile from './MessageFile/MessageFile';
+import { chatRoomFileRef } from '../../../firebase-config';
+import { deleteObject } from 'firebase/storage';
 
 function Message({ message, onAvatarClick }: MessageProps) {
     const [messageMenuAnchorEl, setMessageMenuAnchorEl] = useState<HTMLElement | null>(null);
@@ -45,18 +39,27 @@ function Message({ message, onAvatarClick }: MessageProps) {
     }
 
     async function handleDeleteMessage() {
-        if (message.senderId === currentUserId) {
+        if (message.senderId !== currentUserId) {
+            toast.info('You cannot delete message which is not yours!');
+            return;
+        }
+        if (message.type === 'Files' || message.type === 'AudioRecord') {
             try {
-                await MessageAPI.setDeleteMessage(message.id);
-                toast.success('Message deleted!');
+                const fileRef = chatRoomFileRef(message.chatRoomId, message.id);
+                await deleteObject(fileRef);
             } catch (err) {
-                toast.error('Error deleting message, please try again')
-                console.error(err);
+                console.error('Cannot delete file in firebase')
             }
         }
-        else {
-            toast.info('You cannot delete message which is not yours!');
+
+        try {
+            await MessageAPI.setDeleteMessage(message.id);
+            toast.success('Message deleted!');
+        } catch (err) {
+            toast.error('Error deleting message, please try again')
+            console.error(err);
         }
+
     }
 
     return (
@@ -67,34 +70,9 @@ function Message({ message, onAvatarClick }: MessageProps) {
                 }
                 <div className={styles['message-info']}>
                     {
-                        (message.type === 'Files' && message.fileStatus === 'Done' && isImageFromFileName(message.fileName)) && < ImageMessage message={message} />
+                        (message.type === 'Files' || message.type === 'AudioRecord') && <MessageFile message={message} />
                     }
 
-                    {
-                        message.type === 'Files' && message.fileStatus === 'Done' && !isImageFromFileName(message.fileName) && <DownloadFileMessage message={message} />
-                    }
-
-                    {
-                        message.type === 'Files' && message.fileStatus === 'InProgress'
-                        && <UploadFileMessage message={message} />
-
-                    }
-                    {
-                        message.type === 'Files' && message.fileStatus === 'Cancelled' && <CancelledFileMessage message={message} />
-                    }
-                    {
-                        message.type === 'AudioRecord' && message.fileStatus === 'InProgress' && <UploadingAudioMessage />
-                    }
-
-                    {
-                        message.type === 'AudioRecord' && message.fileStatus === 'Done' && <AudioMessage message={message} />
-                    }
-                    {
-                        message.replyToMessage && <RepliedMessage message={message.replyToMessage} />
-                    }
-                    {
-                        (message.type === 'Files' || message.type === 'AudioRecord') && message.fileStatus === 'Error' && <ErrorMessageFile message={message} />
-                    }
                     <Typography color='black' >{message.messageText}</Typography>
                     <span className={styles.time}>{messageTime(message.createdTime)}</span>
                 </div>

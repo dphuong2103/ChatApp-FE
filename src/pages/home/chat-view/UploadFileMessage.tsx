@@ -19,8 +19,6 @@ function UploadFileMessage({ message }: UploadFileMessageType) {
             })
         }
         return () => {
-            console.log(unsubscribe);
-            // unsubscribe();
             unsubscribe();
         }
     }, [message.uploadTask])

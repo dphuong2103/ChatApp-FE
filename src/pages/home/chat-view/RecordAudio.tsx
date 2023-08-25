@@ -11,23 +11,25 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const [paused, setPaused] = useState(false);
     const chunksRef = useRef<Blob[]>([]);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    function handleStartInterval(interval: NodeJS.Timeout) {
-        return setInterval(() => {
-            setDuration(prev => {
-                if (prev >= maxDuration) {
-                    mediaRecorderRef.current?.stop();
-                    clearInterval(interval)
-                    handleSubmit();
-                    return prev;
-                }
-                return prev + 100;
-            })
-        }, 100)
+    function handleStartInterval() {
+        setTimeout(() => {
+            intervalRef.current = setInterval(() => {
+                setDuration(prev => {
+                    if (prev >= maxDuration) {
+                        mediaRecorderRef.current?.stop();
+                        intervalRef.current && clearInterval(intervalRef.current)
+                        handleSubmit();
+                        return prev;
+                    }
+                    return prev + 100;
+                })
+            }, 100)
+        }, 100);
     }
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
         if (isRecording) {
             handleStartRecording();
         }
@@ -47,27 +49,29 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
 
                 mediaRecorderRef.current.addEventListener('stop', () => {
                     stream.getTracks().forEach(track => track.stop())
-                    clearInterval(interval);
+                    intervalRef.current && clearInterval(intervalRef.current);
 
                 })
 
                 mediaRecorderRef.current.addEventListener('pause', () => {
-                    clearInterval(interval)
+                    intervalRef.current && clearInterval(intervalRef.current);
+
                 })
 
                 mediaRecorderRef.current.addEventListener('start', () => {
-                    interval = handleStartInterval(interval);
+                    handleStartInterval();
                 })
 
                 mediaRecorderRef.current.addEventListener('resume', () => {
-                    interval = handleStartInterval(interval);
+                    handleStartInterval();
+
                 })
 
                 mediaRecorderRef.current.start(100);
 
             } catch (err) {
                 console.error(err);
-                clearInterval(interval);
+                intervalRef.current && clearInterval(intervalRef.current);
                 mediaRecorderRef.current?.stop();
                 toast.error('Error recording, please try again later!')
             }
@@ -75,7 +79,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
 
 
         return () => {
-            clearInterval(interval);
+            intervalRef.current && clearInterval(intervalRef.current);
             handleCancelRecording();
         }
     }, [isRecording])
@@ -96,10 +100,14 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
 
     async function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
         e?.preventDefault();
-        mediaRecorderRef.current?.stop();
-        const newBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        await onSubmit(newBlob);
-        stopRecording();
+        intervalRef.current && clearTimeout(intervalRef.current)
+        setTimeout(async () => {
+            mediaRecorderRef.current?.stop();
+            const newBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+            await onSubmit(newBlob);
+            stopRecording();
+        }, 100);
+
     }
 
     return (

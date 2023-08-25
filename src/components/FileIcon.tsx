@@ -9,6 +9,8 @@ import png from '../assets/imgs/file-extensions/png.svg';
 import svg from '../assets/imgs/file-extensions/xls.svg';
 import pdf from '../assets/imgs/file-extensions/pdf.svg';
 import unknown from '../assets/imgs/file-extensions/unknown.svg';
+import video from '../assets/imgs/file-extensions/video.svg';
+import mp3 from '../assets/imgs/file-extensions/mp3.svg';
 import { useMemo } from 'react';
 
 const extensionMapping = {
@@ -22,6 +24,8 @@ const extensionMapping = {
     png: png,
     svg: svg,
     pdf: pdf,
+    video: video,
+    mp3: mp3,
     unknown: unknown
 } as const
 
@@ -41,7 +45,7 @@ type FileIconProps = {
 }
 
 function getFileExtensionImage(name: string) {
-    if(!name) return extensionMapping.unknown;
+    if (!name) return extensionMapping.unknown;
     let extension: keyof typeof extensionMapping | null = null;
     for (const key of Object.keys(extensionMapping)) {
         if ((key as keyof typeof extensionMapping).includes(name) || name.includes(key as keyof typeof extensionMapping)) {

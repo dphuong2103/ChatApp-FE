@@ -3,7 +3,8 @@ import styles from '../../../styles/RecordAudio.module.scss';
 import { recordingDuration } from '../../../helper/dateTime';
 import { PaperPlaneRight, Pause, Play, Record, X } from 'phosphor-react';
 import { IconButton, Typography } from '@mui/material';
-const maxDuration = (10 * 100)*60*4;
+import { toast } from 'react-toastify';
+const maxDuration = (10 * 100) * 60 * 4;
 
 function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps) {
     const [duration, setDuration] = useState(0);
@@ -24,7 +25,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
             })
         }, 100)
     }
-    
+
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (isRecording) {
@@ -36,7 +37,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
             chunksRef.current = [];
             try {
                 let stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-
+                // audio/webm
                 mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
                 mediaRecorderRef.current.addEventListener('dataavailable', (e) => {
@@ -47,6 +48,7 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
                 mediaRecorderRef.current.addEventListener('stop', () => {
                     stream.getTracks().forEach(track => track.stop())
                     clearInterval(interval);
+
                 })
 
                 mediaRecorderRef.current.addEventListener('pause', () => {
@@ -65,8 +67,13 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
 
             } catch (err) {
                 console.error(err);
+                clearInterval(interval);
+                mediaRecorderRef.current?.stop();
+                toast.error('Error recording, please try again later!')
             }
         }
+
+
         return () => {
             clearInterval(interval);
             handleCancelRecording();

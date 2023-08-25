@@ -31,6 +31,7 @@ function ChatInfo() {
   const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
   const [openUploadAvatar, setOpenUploadAvatar] = useState(false);
   const [openLeaveChatDialog, setOpenLeaveChatDialog] = useState(false);
+
   async function handleClickMute() {
     if (!currentChatRoomSummary) return;
 
@@ -158,7 +159,7 @@ function ChatInfo() {
           }
 
           <MenuList className={styles['actions-container']}>
-            <MenuItem>
+            <MenuItem onClick={() => { toast.error('Function is underdevelopment!') }}>
               <ListItemIcon >
                 <DeleteOutlineOutlinedIcon fontSize="small" />
               </ListItemIcon>

@@ -226,6 +226,22 @@ function ActionBar() {
         };
     }, []);
 
+    function handleOnPasteCapture(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+        if (e.clipboardData.files.length > 0) {
+            setSelectedFile(e.clipboardData.files[0])
+        }
+    }
+
+    function handleDragFileOver(e: React.DragEvent<HTMLTextAreaElement>) {
+        e.preventDefault();
+    }
+    function handleDropFile(e: React.DragEvent<HTMLTextAreaElement>) {
+        e.preventDefault();
+        if (e.dataTransfer.files[0]) {
+            setSelectedFile(e.dataTransfer.files[0])
+        }
+    }
+
     useEffect(() => {
         setTextInput('')
         setSelectedFile(null);
@@ -268,7 +284,18 @@ function ActionBar() {
             </div>
 
             <div className={styles['action-bar-container']}>
-                <textarea rows={1} onChange={handleOnTextChange} value={textInput} placeholder='Enter message...' onKeyDown={handleKeyDown} ref={messageInputRef} />
+                <textarea
+                    rows={1}
+                    onChange={handleOnTextChange}
+                    value={textInput}
+                    placeholder='Enter message...'
+                    onKeyDown={handleKeyDown}
+                    ref={messageInputRef}
+                    onPasteCapture={handleOnPasteCapture}
+                    onDrop={handleDropFile}
+                    onDragOver={handleDragFileOver}
+
+                />
                 <div className={styles['btn-container']}>
                     <IconButton type='button' ref={iconButtonRef} onClick={handleClickShowEmoji} >
                         <Smiley />

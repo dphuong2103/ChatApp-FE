@@ -3,7 +3,6 @@ import styles from '@styles/AudioMessage.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { Microphone, Pause, Play } from 'phosphor-react';
 import { MessageAPI } from '@api';
-import { chatRoomFileRef } from '../../../../../firebase-config';
 import fixWebmDuration from 'webm-duration-fix';
 import { recordingDuration } from '@helper/dateTime';
 import { ClipLoader } from 'react-spinners';
@@ -32,7 +31,7 @@ function AudioMessage({ message }: AudioMessageProps) {
         async function handleGetAudio() {
             try {
 
-                var audioData = await MessageAPI.getAudioBlob(chatRoomFileRef(message.chatRoomId, message.id));
+                var audioData = await MessageAPI.getAudioBlob(message.chatRoomId, message.id);
                 //Error: duration is infinity, used fixWebmDurationfor to fix
                 const fixBlob = await fixWebmDuration(audioData);
                 audioRef.current = new Audio(URL.createObjectURL(fixBlob));

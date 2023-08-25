@@ -3,7 +3,7 @@ import styles from '../../styles/Auth.module.scss';
 import { LoadingButton } from '@mui/lab';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { requestResetPasswordByEmail } from '../../firebase-config';
+import { requestResetPasswordByEmail } from '../../firebase/firebase-config';
 import { ArrowLeft } from 'phosphor-react';
 import { Link } from 'react-router-dom';
 

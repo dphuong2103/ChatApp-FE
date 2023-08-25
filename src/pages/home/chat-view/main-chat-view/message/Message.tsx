@@ -13,7 +13,7 @@ import MessageActionMenu from './MessageActionMenu';
 import { MessageAPI } from '@api';
 import { useChatContext } from '@helper/getContext';
 import MessageFile from './MessageFile';
-import { chatRoomFileRef } from '../../../../../firebase-config';
+import { getChatRoomFileRef } from '../../../../../firebase/firebase-config';
 import { deleteObject } from 'firebase/storage';
 import RepliedMessage from './RepliedMessage';
 
@@ -46,7 +46,7 @@ function Message({ message, onAvatarClick }: MessageProps) {
         }
         if (message.type === 'Files' || message.type === 'AudioRecord') {
             try {
-                const fileRef = chatRoomFileRef(message.chatRoomId, message.id);
+                const fileRef = getChatRoomFileRef(message.chatRoomId, message.id);
                 await deleteObject(fileRef);
             } catch (err) {
                 console.error('Cannot delete file in firebase')

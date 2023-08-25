@@ -1,8 +1,9 @@
 import { myAxios } from '.';
 import { Message, NewMessage, NewMessageForAudioRecord, NewMessageForFileUpload } from '@data-type';
-import { chatRoomFileRef } from '../firebase-config';
-import { StorageReference, getBlob, getMetadata } from 'firebase/storage';
+import { getChatRoomFileRef } from '../firebase/firebase-config';
+import { getBlob, getMetadata } from 'firebase/storage';
 const API_URL_MESSAGE = '/api/messages';
+
 
 const MessageAPI = {
     getMessagesByChatRoomId: function (chatRoomId: string) {
@@ -28,7 +29,7 @@ const MessageAPI = {
         return myAxios().put(url, JSON.stringify(fileUrls));
     },
     getMessageFileMetaData: async function (chatRoomId: string, messageId: string) {
-        const fileRef = chatRoomFileRef(chatRoomId, messageId)
+        const fileRef = getChatRoomFileRef(chatRoomId, messageId)
         const metadata = await getMetadata(fileRef)
         return metadata
     },
@@ -41,7 +42,8 @@ const MessageAPI = {
     addNewMessageForAudioRecord: function (request: NewMessageForAudioRecord) {
         return myAxios().post<Message>(`${API_URL_MESSAGE}/addnewmessageforaudiorecord`, JSON.stringify(request));
     },
-    getAudioBlob: function (storageRef: StorageReference) {
+    getAudioBlob: function (chatRoomId: string, messageId: string) {
+        const storageRef = getChatRoomFileRef(chatRoomId, messageId);
         return getBlob(storageRef);
     },
     uploadFileMessageError: function (messageId: string) {

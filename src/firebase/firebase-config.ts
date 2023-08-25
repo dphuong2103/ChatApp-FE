@@ -55,11 +55,21 @@ type updateInfo = {
 export function updateFirebaseUserInfo(updateInfo: updateInfo) {
   return updateProfile(auth.currentUser!, updateInfo)
 }
+
 export const storage = getStorage(app);
 
-export const userAvatarListRef = ref(storage, 'images/useravatar')
+const UserAvatarRef = 'images/useravatar';
+export const userAvatarListRef = ref(storage, UserAvatarRef);
 
-export const chatRoomFileRef =
-  (chatRoomId: string, fileName: string) => ref(storage, `chatrooms/messagefiles/${chatRoomId}/${fileName}`)
+const PRD = 'prd';
+const DEV = 'dev';
+const chatRoomFileUrl = (chatRoomId: string, messageId: string) => `${import.meta.env.PROD ? PRD : DEV}/chatrooms/messagefiles/${chatRoomId}/${messageId}`
+
+export const getChatRoomFileRef =
+  (chatRoomId: string, messageId: string) => ref(storage, chatRoomFileUrl(chatRoomId, messageId))
+
+const chatRoomAvatarUrl = (chatRoomId: string) => `${import.meta.env.PROD ? PRD : DEV}/images/chatroomavatar/${chatRoomId}`;
+
+export const chatRoomAvatarRef = (chatRoomId: string) => ref(storage, chatRoomAvatarUrl(chatRoomId));
 
 export const firebaseLogOut = () => auth.signOut();

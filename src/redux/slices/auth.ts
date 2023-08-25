@@ -7,7 +7,7 @@ import {
   signInWithGoogle,
   updateFirebaseUserInfo,
   updateGoogleUserDisplayName,
-} from '../../firebase-config';
+} from '../../firebase/firebase-config';
 import { convertGoogleUserToUser } from '@helper/helper';
 import { toast } from 'react-toastify';
 import { UserSignUpForm } from '../../pages/auth/SignUp';

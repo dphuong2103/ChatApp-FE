@@ -1,6 +1,6 @@
 import { getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { Message, UploadFileStatus, UploadTask as UploadTaskType } from '@data-type';
-import { chatRoomFileRef } from '../firebase-config';
+import { getChatRoomFileRef } from '../firebase/firebase-config';
 import { MessageAPI } from '@api';
 
 export function uploadFileTask(message: (Message & ({
@@ -12,7 +12,7 @@ export function uploadFileTask(message: (Message & ({
 })), onFinish?: () => void
 ): UploadTaskType {
     let observers: ((uploadStatus: UploadFileStatus) => void)[] = [];
-    const storageRef = chatRoomFileRef(message.chatRoomId, message.id);
+    const storageRef = getChatRoomFileRef(message.chatRoomId, message.id);
     const uploadTask = message.type === 'Files' ? uploadBytesResumable(storageRef, message.files) : uploadBytesResumable(storageRef, message.audio,);
     let uploadStatus: UploadFileStatus = { progress: 0 };
 

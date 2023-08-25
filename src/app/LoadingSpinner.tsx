@@ -1,5 +1,5 @@
 import BeatLoader from 'react-spinners/BeatLoader';
-import styles from '../styles/LoadingSpinner.module.scss';
+import styles from '@styles/LoadingSpinner.module.scss';
 function LoadingSpinner() {
     return (
         <>

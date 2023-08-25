@@ -1,9 +1,9 @@
 import { createContext, useEffect, useReducer, useState } from 'react'
-import { ChatRoom, ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, Message, User, UserChatRoom, UserRelationship } from '../types/dataType';
-import { sortChatRoomSummary } from '../helper/filterDuplicateItemInArray';
-import { ChatRoomAPI, UserRelationshipAPI } from '../api';
-import { useHubConnection } from '../helper/getContext';
-import { isChatRoomSummary } from '../helper/checkType';
+import { ChatRoom, ChatRoomIdAndName, ChatRoomIdAndUserId, ChatRoomIdAndUsers, ChatRoomSummary, ChatRoomSummaryActionType, ChatRoomSummaryConnectionFunction, ConnectionFunction, ContextChildren, Message, User, UserChatRoom, UserRelationship } from '@data-type';
+import { sortChatRoomSummary } from '@helper/filterDuplicateItemInArray';
+import { ChatRoomAPI, UserRelationshipAPI } from '@api';
+import { useHubConnection } from '@helper/getContext';
+import { isChatRoomSummary } from '@helper/checkType';
 import store from '../redux/store';
 
 type ChatRoomSummaryAction = {

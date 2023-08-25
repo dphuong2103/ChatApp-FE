@@ -1,5 +1,5 @@
 import { myAxios } from '.';
-import { AddMembersToChatGroup, RemoveFromGroupChat, SetMutedDTO, UpdateLastMessageRead, UserChatRoom } from '../types/dataType';
+import { AddMembersToChatGroup, RemoveFromGroupChat, SetMutedDTO, UpdateLastMessageRead, UserChatRoom } from '@data-type';
 
 const API_URL_USERCHATROOM = '/api/userchatrooms';
 

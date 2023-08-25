@@ -1,5 +1,5 @@
 import { IconButton, Modal, Typography } from '@mui/material'
-import { ChatRoomInfo } from '../types/dataType'
+import { ChatRoomInfo } from '@data-type'
 import styles from '../styles/CallingModal.module.scss';
 import Avatar from './Avatar';
 import answerCallIcon from '../assets/imgs/answercallicon.svg';

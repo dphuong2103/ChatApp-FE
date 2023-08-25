@@ -1,8 +1,8 @@
-import { User } from '../../types/dataType'
-import styles from '../../styles/Partner.module.scss';
+import { User } from '@data-type'
+import styles from '@styles/Partner.module.scss';
 import Avatar from '../Avatar';
 import { Typography } from '@mui/material';
-import { generateClassName } from '../../utils/generateClassName';
+import { generateClassName } from '@helper/generateClassName';
 function Partner({ partner, checked, onClick, isMember }: PartnerProps) {
   return <div className={generateClassName(styles, ['user-container', ...isMember ? ['light'] : []])} onClick={isMember ? undefined : onClick}>
     <input type='checkbox' checked={checked || isMember || false} readOnly />

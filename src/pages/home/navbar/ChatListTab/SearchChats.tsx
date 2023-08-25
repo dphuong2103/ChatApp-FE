@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import styles from '../../../../styles/SearchChats.module.scss';
+import styles from '@styles/SearchChats.module.scss';
 import { useSearchInput } from './ChatListTab';
-import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../../../helper/getContext';
+import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
 import SearchedChat from './SearchedChat';
-import { ChatRoomSummary, User } from '../../../../types/dataType';
-import { isValidEmail } from '../../../../helper/checkString';
-import { UserAPI } from '../../../../api';
+import { ChatRoomSummary, User } from '@data-type';
+import { isValidEmail } from '@helper/checkString';
+import { UserAPI } from '@api';
 import { useDebounce } from '../../../../hooks/useDounceSearch';
-import { filterChatRoom, removeDuplicateChat } from '../../../../helper/chatRoomHelper';
-import { isUser, isChatRoomSummary } from '../../../../helper/checkType';
+import { filterChatRoom, removeDuplicateChat } from '@helper/chatRoomHelper';
+import { isUser, isChatRoomSummary } from '@helper/checkType';
 function SearchChats() {
   const { searchInput } = useSearchInput();
   const [searchResult, setSearchResult] = useState<(ChatRoomSummary | User)[]>([]);

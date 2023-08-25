@@ -1,8 +1,8 @@
 import { createContext, useEffect, useReducer, useRef, useState } from 'react'
-import { CallStatus, CallType, ChatRoomInfo, ChatRoomSummary, ChatRoomType, ConnectionFunction, ContextChildren, InvokeServerFunction, User } from '../types/dataType';
-import { useChatRoomSummaryContext, useHubConnection } from '../helper/getContext';
+import { CallStatus, CallType, ChatRoomInfo, ChatRoomSummary, ChatRoomType, ConnectionFunction, ContextChildren, InvokeServerFunction, User } from '@data-type';
+import { useChatRoomSummaryContext, useHubConnection } from '@helper/getContext';
 import SimplePeer from 'simple-peer';
-import { getChatRoomInfo, getChatRoomSummaryByChatRoomId } from '../helper/chatRoomHelper';
+import { getChatRoomInfo, getChatRoomSummaryByChatRoomId } from '@helper/chatRoomHelper';
 import ReceivingCallModal from '../components/ReceivingCallModal';
 import CallWindow from '../components/CallWindow';
 import { useAppSelector } from '../redux/store';

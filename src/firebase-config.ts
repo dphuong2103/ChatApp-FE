@@ -56,7 +56,10 @@ export function updateFirebaseUserInfo(updateInfo: updateInfo) {
   return updateProfile(auth.currentUser!, updateInfo)
 }
 export const storage = getStorage(app);
+
 export const userAvatarListRef = ref(storage, 'images/useravatar')
+
 export const chatRoomFileRef =
   (chatRoomId: string, fileName: string) => ref(storage, `chatrooms/messagefiles/${chatRoomId}/${fileName}`)
+
 export const firebaseLogOut = () => auth.signOut();

@@ -1,7 +1,7 @@
 import { MagnifyingGlass } from 'phosphor-react';
-import styles from '../styles/SearchBar.module.scss';
+import styles from '@styles/SearchBar.module.scss';
 import { MouseEventHandler, useState } from 'react';
-import { generateClassName } from '../utils/generateClassName';
+import { generateClassName } from '@helper/generateClassName';
 function SearchBar({ onClick, handleFocusIn, handleFocusOut, value, onChange, placeholder }: SearchBarProps) {
     const [focus, setFocus] = useState(false);
     function handleInputFocusIn(_e: React.FocusEvent<HTMLDivElement, Element>) {

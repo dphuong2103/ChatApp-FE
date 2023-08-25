@@ -1,4 +1,4 @@
-import { UserRelationship, NewUserRelationship } from './../types/dataType';
+import { UserRelationship, NewUserRelationship } from '@data-type';
 import myAxios from './config';
 import store from '../redux/store';
 const API_URL_USERRELATIONSHIP = '/api/userrelationships'

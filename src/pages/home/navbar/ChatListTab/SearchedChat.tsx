@@ -1,8 +1,8 @@
 import styles from '../../../../styles/SearchedChat.module.scss';
-import { ChatRoomInfo, ChatRoomSummary, User } from '../../../../types/dataType';
+import { ChatRoomInfo, ChatRoomSummary, User } from '@data-type';
 import { useEffect, useState } from 'react';
-import { isChatRoomSummary, isUser } from '../../../../helper/checkType';
-import { getChatRoomInfo } from '../../../../helper/chatRoomHelper';
+import { isChatRoomSummary, isUser } from '@helper/checkType';
+import { getChatRoomInfo } from '@helper/chatRoomHelper';
 import Avatar from '../../../../components/Avatar';
 import { Typography } from '@mui/material';
 

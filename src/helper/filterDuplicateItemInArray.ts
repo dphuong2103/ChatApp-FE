@@ -1,4 +1,4 @@
-import { ChatRoomSummary } from '../types/dataType';
+import { ChatRoomSummary } from '@data-type';
 
 export function sortChatRoomSummary(chatRoomSummaries: ChatRoomSummary[]): ChatRoomSummary[] {
     chatRoomSummaries = chatRoomSummaries.sort((a, b) => {

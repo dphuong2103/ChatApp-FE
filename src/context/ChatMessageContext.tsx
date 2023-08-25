@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
-import { ChatRoomSummary, ContextChildren, Message, NewChat } from '../types/dataType';
-import { useCurrentChatRoomContext } from '../helper/getContext';
+import { ChatRoomSummary, ContextChildren, Message, NewChat } from '@data-type';
+import { useCurrentChatRoomContext } from '@helper/getContext';
 
 export const ChatMessageContext = createContext({} as ChatContextProviderValue);
 

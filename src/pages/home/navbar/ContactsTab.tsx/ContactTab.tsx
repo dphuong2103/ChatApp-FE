@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import { ArrowLeft } from 'phosphor-react';
 import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import SearchBar from '../../../../components/SearchBar';
-import styles from '../../../../styles/ContactTab.module.scss';
+import styles from '@styles/ContactTab.module.scss';
 import { useState } from 'react';
 
 import RadioButtons from '../../../../components/RadioButtons';

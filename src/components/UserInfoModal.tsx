@@ -1,16 +1,16 @@
 import { Button, Dialog, DialogActions, DialogTitle, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Modal, Typography } from '@mui/material';
-import styles from '../styles/UserInfoModal.module.scss';
+import styles from '@styles/UserInfoModal.module.scss';
 import Avatar from './Avatar';
-import { ChatRoomSummaryActionType, User, UserRelationship } from '../types/dataType';
-import { generateClassName } from '../utils/generateClassName';
+import { ChatRoomSummaryActionType, User, UserRelationship } from '@data-type';
+import { generateClassName } from '@helper/generateClassName';
 import { useEffect, useState } from 'react';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { UserAPI, UserRelationshipAPI } from '../api';
 import { useAppSelector } from '../redux/store';
 import { X } from 'phosphor-react';
-import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../helper/getContext';
-import { getChatRoomAndUserListByUserIdFromChatRoomSummaries } from '../helper/chatRoomHelper';
-import { formatDateFromString } from '../helper/dateTime';
+import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
+import { getChatRoomAndUserListByUserIdFromChatRoomSummaries } from '@helper/chatRoomHelper';
+import { formatDateFromString } from '@helper/dateTime';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import { toast } from 'react-toastify';
 function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalProps) {

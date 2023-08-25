@@ -1,5 +1,5 @@
-import { MessageAPI } from '../api';
-import { Message, UploadTask } from '../types/dataType';
+import { MessageAPI } from '@api';
+import { Message, UploadTask } from '@data-type';
 
 export function sortMessages(messages: Message[]): Message[] {
     return messages.sort((a, b) => {

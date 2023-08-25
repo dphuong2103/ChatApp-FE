@@ -2,7 +2,7 @@ import { Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedI
 import { Link, useNavigate } from 'react-router-dom'
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
-import styles from '../../styles/Auth.module.scss';
+import styles from '@styles/Auth.module.scss';
 import { LoadingButton } from "@mui/lab";
 import { useState } from 'react';
 import { GithubLogo, GoogleLogo, TwitterLogo } from 'phosphor-react';

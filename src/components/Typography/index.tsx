@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import styles from './styles.module.scss';
-import { generateClassName } from '../../utils/generateClassName';
+import styles from '@styles.module.scss';
+import { generateClassName } from '@helper/generateClassName';
 interface TitleTextProps {
   size?: 'xl' | 'l' | 'm' | 's' | 'xs';
   color?: 'title' | 'subtitle' | 'text';

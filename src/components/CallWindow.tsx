@@ -1,11 +1,11 @@
 import NewWindow from 'react-new-window'
-import { CallStatus, CallType,  ChatRoomInfo } from '../types/dataType'
+import { CallStatus, CallType,  ChatRoomInfo } from '@data-type'
 import { forwardRef, useState } from 'react'
 import Avatar from './Avatar'
-import styles from '../styles/CallWindow.module.scss'
+import styles from '@styles/CallWindow.module.scss'
 import { IconButton, Typography } from '@mui/material'
 import { Microphone, MicrophoneSlash, PhoneX } from 'phosphor-react'
-import { generateClassName } from '../utils/generateClassName'
+import { generateClassName } from '@helper/generateClassName'
 type CallWindowProps = {
     callInfo: {
         chatRoomInfo: ChatRoomInfo | null,

@@ -1,6 +1,6 @@
 
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
-import { User } from '../types/dataType';
+import { User } from '@data-type';
 import myAxios from './config';
 import { storage } from '../firebase-config';
 

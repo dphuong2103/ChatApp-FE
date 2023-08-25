@@ -1,9 +1,9 @@
 import { createContext, useEffect, useReducer, useState } from 'react';
-import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UpdateLastMessageRead, UploadTask, User } from '../types/dataType';
-import { useChatRoomSummaryContext, useHubConnection } from '../helper/getContext';
-import { MessageAPI, UserChatRoomAPI } from '../api';
-import { handleGetMessageUploadTask, handleTransFormMessages, handleUpsertOrDeleteMessage } from '../helper/messageHelper';
-import { getChatRoomInfo } from '../helper/chatRoomHelper';
+import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UpdateLastMessageRead, UploadTask, User } from '@data-type';
+import { useChatRoomSummaryContext, useHubConnection } from '@helper/getContext';
+import { MessageAPI, UserChatRoomAPI } from '@api';
+import { handleGetMessageUploadTask, handleTransFormMessages, handleUpsertOrDeleteMessage } from '@helper/messageHelper';
+import { getChatRoomInfo } from '@helper/chatRoomHelper';
 import { useAppSelector } from '../redux/store';
 import { uploadFileTask } from '../hooks/useUploadFile';
 

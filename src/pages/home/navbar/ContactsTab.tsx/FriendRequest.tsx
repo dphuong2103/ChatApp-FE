@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material';
 import Avatar from '../../../../components/Avatar';
-import styles from '../../../../styles/FriendRequest.module.scss'
-import { UserRelationship } from '../../../../types/dataType';
-import { generateClassName } from '../../../../utils/generateClassName';
-import { UserRelationshipAPI } from '../../../../api';
+import styles from '@styles/FriendRequest.module.scss'
+import { UserRelationship } from '@data-type';
+import { generateClassName } from '@helper/generateClassName';
+import { UserRelationshipAPI } from '@api';
 function FriendRequest({ friendRequest, type }: FriendRequestProps) {
     if (type === 'unknown') return;
     if (type === 'receive' && !friendRequest.initiatorUser) return;

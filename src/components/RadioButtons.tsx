@@ -1,4 +1,4 @@
-import styles from '../styles/RadioButtons.module.scss';
+import styles from '@styles/RadioButtons.module.scss';
 function ToggleButtons({ children }: ToggleButtons) {
 
     return <>

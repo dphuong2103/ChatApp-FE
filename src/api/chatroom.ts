@@ -1,6 +1,6 @@
-import { ChatRoomIdAndImageUrl } from './../types/dataType';
+import { ChatRoomIdAndImageUrl } from '@data-type';
 import { myAxios } from '.';
-import { ChatRoomIdAndName, ChatRoomSummary, NewChatRoomAndUserList } from '../types/dataType';
+import { ChatRoomIdAndName, ChatRoomSummary, NewChatRoomAndUserList } from '@data-type';
 import store from '../redux/store';
 import { storage } from '../firebase-config';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';

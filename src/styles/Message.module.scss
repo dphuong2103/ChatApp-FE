@@ -57,43 +57,6 @@
             color: grey;
             font-size: 0.80rem;
         }
-
-        & .replied-message-container {
-            overflow: hidden;
-            position: relative;
-            padding-left: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-
-            @include desktop {
-                max-width: 35rem;
-            }
-
-            & .replied-message {
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                word-wrap: break-word;
-                max-width: 100%;
-            }
-
-            &::before {
-                content: '';
-                top: 4px;
-                width: 2px;
-                height: 90%;
-                background: #3989ff;
-                position: absolute;
-                left: 0px;
-            }
-
-            &.d-none {
-                display: none;
-            }
-
-        }
-
     }
 }
 

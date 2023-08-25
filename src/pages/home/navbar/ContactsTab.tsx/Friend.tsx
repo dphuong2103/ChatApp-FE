@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import Avatar from '../../../../components/Avatar';
 import styles from '../../../../styles/Friend.module.scss';
-import { Friend as TypeFriend, Friend } from '../../../../types/dataType';
+import { Friend as TypeFriend, Friend } from '@data-type';
 
 function Friend({ friend, onClick }: ContactProps) {
 

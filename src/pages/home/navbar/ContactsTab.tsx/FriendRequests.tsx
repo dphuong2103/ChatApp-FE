@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { UserRelationship } from '../../../../types/dataType';
-import { useChatRoomSummaryContext } from '../../../../helper/getContext';
+import { UserRelationship } from '@data-type';
+import { useChatRoomSummaryContext } from '@helper/getContext';
 import { useAppSelector } from '../../../../redux/store';
 import FriendRequest from './FriendRequest';
 

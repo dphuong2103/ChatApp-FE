@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { HttpTransportType, HubConnectionBuilder, LogLevel, HubConnection as HubConnectionType } from '@microsoft/signalr';
-import { ConnectionFunction, ContextChildren, InvokeServerFunction } from '../types/dataType';
+import { ConnectionFunction, ContextChildren, InvokeServerFunction } from '@data-type';
 import { useAppDispatch, useAppSelector } from '../redux/store';
 import { BASEURL } from '../api/config';
 import { toast } from 'react-toastify';

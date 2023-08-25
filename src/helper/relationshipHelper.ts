@@ -1,5 +1,5 @@
 import store from '../redux/store';
-import { RelationshipStatus, UserRelationship } from './../types/dataType';
+import { RelationshipStatus, UserRelationship } from '@data-type';
 
 export function getRelationship(currentUserId: string, targetUserId: string, userRelationships: UserRelationship[]) {
     if (userRelationships.length == 0) return;

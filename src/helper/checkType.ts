@@ -1,4 +1,4 @@
-import { ChatRoom, ChatRoomSummary, NewChat, User } from '../types/dataType';
+import { ChatRoom, ChatRoomSummary, NewChat, User } from '@data-type';
 
 export function isChatRoom(object: unknown): object is ChatRoom {
     if (object != null && typeof object === "object") {

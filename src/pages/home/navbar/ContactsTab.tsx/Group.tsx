@@ -1,8 +1,8 @@
-import { ChatRoomInfo, ChatRoomSummary } from '../../../../types/dataType'
-import styles from '../../../../styles/Group.module.scss';
+import { ChatRoomInfo, ChatRoomSummary } from '@data-type'
+import styles from '@styles/Group.module.scss';
 import Avatar from '../../../../components/Avatar';
 import { useEffect, useState } from 'react';
-import { getChatRoomInfo } from '../../../../helper/chatRoomHelper';
+import { getChatRoomInfo } from '@helper/chatRoomHelper';
 import Typography from '@mui/material/Typography/Typography';
 
 function Group({ chatRoomSummary, onClick }: GroupProps) {

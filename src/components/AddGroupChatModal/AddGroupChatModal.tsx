@@ -4,14 +4,14 @@ import { X } from 'phosphor-react';
 import SearchBar from '../SearchBar';
 import { useEffect, useState } from 'react';
 import Partner from './Partner';
-import { AddMembersToChatGroup, NewChatRoom, NewChatRoomAndUserList, User as TUser, User } from '../../types/dataType';
+import { AddMembersToChatGroup, NewChatRoom, NewChatRoomAndUserList, User as TUser, User } from '@data-type';
 import { useAppSelector } from '../../redux/store';
 import SelectedPartner from './SelectedPartner';
-import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../helper/getContext';
-import { stringContains } from '../../helper/checkString';
-import { ChatRoomAPI, UserChatRoomAPI } from '../../api';
-import { generateClassName } from '../../utils/generateClassName';
-import { isChatRoomSummary } from '../../helper/checkType';
+import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
+import { stringContains } from '@helper/checkString';
+import { ChatRoomAPI, UserChatRoomAPI } from '@api';
+import { generateClassName } from '@helper/generateClassName';
+import { isChatRoomSummary } from '@helper/checkType';
 
 function AddGroupChatModal({ open, onClose, members, type }: AddGroupChatModalProps) {
     const [searchValue, setSearchValue] = useState('');

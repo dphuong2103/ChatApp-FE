@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../../../helper/getContext';
-import styles from '../../../../styles/Groups.module.scss';
-import { ChatRoomSummary } from '../../../../types/dataType';
+import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
+import styles from '@styles/Groups.module.scss';
+import { ChatRoomSummary } from '@data-type';
 import Group from './Group';
 function Groups() {
     const { chatRoomSummaries } = useChatRoomSummaryContext();

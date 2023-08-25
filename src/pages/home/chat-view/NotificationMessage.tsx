@@ -1,4 +1,4 @@
-import styles from '../../../styles/NotificationMessage.module.scss';
+import styles from '@styles/NotificationMessage.module.scss';
 
 function NotificationMessage() {
     return (

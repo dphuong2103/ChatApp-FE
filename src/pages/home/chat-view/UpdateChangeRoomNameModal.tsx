@@ -1,9 +1,9 @@
 import { Button, Modal, TextField, Typography } from '@mui/material'
-import { ChatRoom, ChatRoomIdAndName, ChatRoomInfo } from '../../../types/dataType'
-import styles from '../../../styles/UpdateChatRoomNameModal.module.scss';
+import { ChatRoom, ChatRoomIdAndName, ChatRoomInfo } from '@data-type'
+import styles from '@styles/UpdateChatRoomNameModal.module.scss';
 import Avatar from '../../../components/Avatar';
 import { useEffect, useState } from 'react';
-import { ChatRoomAPI } from '../../../api';
+import { ChatRoomAPI } from '@api';
 import LoadingButton from '@mui/lab/LoadingButton';
 function UpdateChatRoomNameModal({ open, chatRoom, onClose, chatRoomInfo }: UpdateChatRoomNameModalProps) {
     const [name, setName] = useState('');

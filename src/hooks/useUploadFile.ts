@@ -1,7 +1,7 @@
 import { getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { Message, UploadFileStatus, UploadTask as UploadTaskType } from '../types/dataType';
+import { Message, UploadFileStatus, UploadTask as UploadTaskType } from '@data-type';
 import { chatRoomFileRef } from '../firebase-config';
-import { MessageAPI } from '../api';
+import { MessageAPI } from '@api';
 
 export function uploadFileTask(message: (Message & ({
     type: 'Files',

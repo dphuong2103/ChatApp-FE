@@ -1,6 +1,6 @@
 import styles from '../styles/Avatar.module.scss';
 import { useState } from 'react';
-import { generateClassName } from '../utils/generateClassName';
+import { generateClassName } from '@helper/generateClassName';
 
 function stringToColor(string: string) {
     let hash = 0;

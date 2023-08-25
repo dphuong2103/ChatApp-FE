@@ -1,5 +1,5 @@
 import store from '../redux/store';
-import { ChatRoomSummary, Friend, UserRelationship } from '../types/dataType';
+import { ChatRoomSummary, Friend, UserRelationship } from '@data-type';
 
 export function getContactAndChatRooms(relationships: UserRelationship[], chatRoomSummaries: ChatRoomSummary[]): Friend[] {
     const currentUserId = store.getState().auth.user?.id;

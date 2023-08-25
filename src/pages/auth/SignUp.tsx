@@ -2,7 +2,7 @@ import { FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, Ou
 import { Link } from 'react-router-dom'
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
-import styles from '../../styles/Auth.module.scss';
+import styles from '@styles/Auth.module.scss';
 import { LoadingButton } from "@mui/lab";
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

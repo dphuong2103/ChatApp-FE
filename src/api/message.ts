@@ -1,5 +1,5 @@
 import { myAxios } from '.';
-import { Message, NewMessage, NewMessageForAudioRecord, NewMessageForFileUpload } from '../types/dataType';
+import { Message, NewMessage, NewMessageForAudioRecord, NewMessageForFileUpload } from '@data-type';
 import { chatRoomFileRef } from '../firebase-config';
 import { StorageReference, getBlob, getMetadata } from 'firebase/storage';
 const API_URL_MESSAGE = '/api/messages';

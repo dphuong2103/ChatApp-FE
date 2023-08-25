@@ -1,5 +1,5 @@
 import { UserCredential } from 'firebase/auth';
-import { User } from '../types/dataType';
+import { User } from '@data-type';
 
 export async function convertGoogleUserToUser(
   ggUser: UserCredential

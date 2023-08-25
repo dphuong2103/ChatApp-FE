@@ -11,7 +11,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 import LoadingSpinner from './app/LoadingSpinner';
 import { ToastContainer } from 'react-toastify';
 import ChatListTab from './pages/home/navbar/ChatListTab/ChatListTab';
-import ChatRooms from './pages/home/ChatRooms';
+import ChatRooms from './pages/home/navbar/ChatListTab/ChatRooms';
 import SearchChats from './pages/home/navbar/ChatListTab/SearchChats';
 import React from 'react';
 import Friends from './pages/home/navbar/ContactsTab.tsx/Friends';

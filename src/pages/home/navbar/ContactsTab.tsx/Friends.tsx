@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import styles from '../../../../styles/Friends.module.scss';
-import { ChatRoomType, NewChatRoomAndUserList, Friend as TFriend } from '../../../../types/dataType';
-import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '../../../../helper/getContext';
-import { getContactAndChatRooms } from '../../../../helper/contactHelper';
+import { ChatRoomType, NewChatRoomAndUserList, Friend as TFriend } from '@data-type';
+import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
+import { getContactAndChatRooms } from '@helper/contactHelper';
 import Friend from './Friend';
 import { useSearchInput } from './ContactTab';
-import { stringContains } from '../../../../helper/checkString';
+import { stringContains } from '@helper/checkString';
 import { toast } from 'react-toastify';
-import { ChatRoomAPI } from '../../../../api';
+import { ChatRoomAPI } from '@api';
 import { useAppSelector } from '../../../../redux/store';
 import { useNavigate } from 'react-router-dom';
 function Friends() {

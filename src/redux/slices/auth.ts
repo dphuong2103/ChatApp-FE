@@ -1,5 +1,5 @@
 import { Dispatch, PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { User } from '../../types/dataType';
+import { User } from '@data-type';
 import {
   createUserWithEmailAndPassword,
   firebaseLogOut,
@@ -8,10 +8,10 @@ import {
   updateFirebaseUserInfo,
   updateGoogleUserDisplayName,
 } from '../../firebase-config';
-import { convertGoogleUserToUser } from '../../helper/helper';
+import { convertGoogleUserToUser } from '@helper/helper';
 import { toast } from 'react-toastify';
 import { UserSignUpForm } from '../../pages/auth/SignUp';
-import { UserAPI } from '../../api';
+import { UserAPI } from '@api';
 type AuthSliceType = {
   user: User | null;
   isLoggedIn: boolean;

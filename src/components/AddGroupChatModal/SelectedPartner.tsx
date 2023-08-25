@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import styles from '../../styles/SelectedUser.module.scss';
-import { User } from '../../types/dataType';
+import { User } from '@data-type';
 import Avatar from '../Avatar';
 import { X } from 'phosphor-react';
 function SelectedPartner({ user, onClick }: SelectedPartnerProps) {

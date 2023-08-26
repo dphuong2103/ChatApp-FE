@@ -63,6 +63,20 @@ function ChatContent() {
       })
   }
 
+  function handleOnLoad() {
+    if (!isScrolling) {
+      setTimeout(() => {
+        chatContentContainerRef.current?.scrollIntoView(
+          {
+            block: 'end',
+            inline: 'nearest',
+            behavior: 'smooth'
+          })
+      }, 100)
+
+    }
+  }
+
   function handleAvatarSelect(user: User) {
     if (!currentUser) return;
     const relationship = getRelationship(currentUser, user.id, relationships);
@@ -72,8 +86,8 @@ function ChatContent() {
 
   return (
     <div className={styles['chat-content-wrapper']}>
-      <div className={styles['container-scrollable']} ref={containerScrollableRef} onScroll={handleOnScroll}>
-        <div className={styles['chat-content-container']} ref={chatContentContainerRef} >
+      <div className={styles['container-scrollable']} ref={containerScrollableRef} onScroll={handleOnScroll} onLoad={handleOnLoad}>
+        <div className={styles['chat-content-container']} ref={chatContentContainerRef}>
           {messages.map((message) => <Message message={message} key={message.id} onAvatarClick={() => handleAvatarSelect(message.sender)} />)}
         </div>
       </div>

@@ -22,6 +22,7 @@
     display: flex;
     justify-content: center;
 
+
     &.d-none {
         display: none;
     }
@@ -36,6 +37,7 @@
         animation-iteration-count: infinite;
         width: 2.5rem;
         height: 2.5rem;
+        border: 1px solid lightgray;
 
         &:hover {
             background-color: grey;

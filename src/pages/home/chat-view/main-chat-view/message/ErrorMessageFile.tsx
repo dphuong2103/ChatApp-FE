@@ -10,10 +10,10 @@ function ErrorMessageFile({ message }: ErrorMessageFile) {
                 message.type === 'AudioRecord' ? <MicrophoneSlash size={30} /> : <img src={errorFile} className={styles.image} />
             }
             <div className={styles['text-container']}>
-                <Typography fontWeight={500}>{message.fileName}</Typography>
+                <span className={styles['file-name']}>{message.fileName}</span>
                 <Typography variant='body2'>
                     {
-                        message.type === 'AudioRecord' ? ' Error uploading audio!' : 'Error uploading file!'
+                        message.type === 'AudioRecord' ? ' Error audio!' : 'Error file!'
                     }
                 </Typography>
             </div>

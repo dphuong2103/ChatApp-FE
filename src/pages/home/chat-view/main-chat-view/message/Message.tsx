@@ -44,6 +44,7 @@ function Message({ message, onAvatarClick }: MessageProps) {
             toast.info('You cannot delete message which is not yours!');
             return;
         }
+
         if (message.type === 'Files' || message.type === 'AudioRecord') {
             try {
                 const fileRef = getChatRoomFileRef(message.chatRoomId, message.id);

@@ -1,5 +1,4 @@
 .upload-file-message-container {
-    width: min(14rem, 90%);
     display: flex;
     gap: 1rem;
 
@@ -17,7 +16,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 100%;
     }
 
     & .upload-status {

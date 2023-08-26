@@ -11,5 +11,13 @@
     & .text-container {
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+    }
+
+    & .file-name {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }

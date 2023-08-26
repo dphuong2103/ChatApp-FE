@@ -24,7 +24,6 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
                     var metaData = await MessageAPI.getMessageFileMetaData(message.chatRoomId, message.id);
                     setMetaData(metaData);
                 } catch (err) {
-                    console.error(err);
                     setHasError(true);
                 } finally {
                     setIsLoading(false);
@@ -42,7 +41,6 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
     }
 
 
-
     return (
 
         <div className={styles['download-file-message-container']} >
@@ -52,11 +50,11 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
             </>
             }
             {
-                metaData && !isLoading && <>
+                !isLoading && <>
                     <FileIcon extension={getExtensionFromName(message.fileName)} />
                     <div className={styles['file-info']}>
                         <span className={styles['file-name']}>{message.fileName}</span>
-                        <span className={styles['file-size']}>{metaData.size && (metaData.size / 1048576).toFixed(2)} mb</span>
+                        <span className={styles['file-size']}>{metaData?.size && (metaData.size / 1048576).toFixed(2)} mb</span>
                     </div>
                     <a className={styles['btn']} href={message.fileUrls} target='_blank'><DownloadIcon /></a>
                 </>

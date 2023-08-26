@@ -68,7 +68,7 @@ export default function Call({ children }: ContextChildren) {
             setCallChatRoomAndUserList({ ...callChatRoomAndUserList });
         }
         try {
-            mediaStream.current = await navigator.mediaDevices.getUserMedia({ video: callType === CallType.VIDEOCALL });
+            mediaStream.current = await navigator.mediaDevices.getUserMedia({ video: callType === CallType.VIDEOCALL, audio: true });
             if (!mediaStream.current) {
                 console.error("Error: getUserMedia returned undefined.");
                 toast.error('Cannot get video or audio, please try again later');

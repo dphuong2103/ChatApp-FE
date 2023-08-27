@@ -73,7 +73,6 @@ function ChatContent() {
             behavior: 'smooth'
           })
       }, 100)
-
     }
   }
 
@@ -97,7 +96,9 @@ function ChatContent() {
           <ArrowDown />
         </IconButton>
       </div>
-      <UserInfoModal open={openUserInfoModal} onClose={() => setOpenUserInfoModal(false)} relationship={selectedUserWithRelationship?.relationship} userId={selectedUserWithRelationship?.user.id} />
+      {
+        selectedUserWithRelationship?.user.id && <UserInfoModal open={openUserInfoModal} onClose={() => setOpenUserInfoModal(false)} relationship={selectedUserWithRelationship?.relationship} userId={selectedUserWithRelationship.user.id} />
+      }
     </div>
   )
 }

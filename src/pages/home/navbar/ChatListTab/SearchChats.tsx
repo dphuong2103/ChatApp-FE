@@ -39,8 +39,8 @@ function SearchChats() {
     }
 
     async function searchUserByEmail() {
-      const searchResponse = await UserAPI.searchUser(searchInputDebounce, abortController);
-      return searchResponse.data;
+      const searchData = await UserAPI.searchUser(searchInputDebounce, abortController);
+      return searchData;
     }
 
     return () => { setSearchResult([]), abortController.abort() }

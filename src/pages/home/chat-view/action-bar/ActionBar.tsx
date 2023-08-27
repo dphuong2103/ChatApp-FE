@@ -17,6 +17,7 @@ import AttachedFiles from './AttachedFiles';
 import FileIcon from '../../../../components/FileIcon';
 import { getExtensionFromName, isImageFromFileName } from '@helper/getFileExtensionImage';
 import RecordAudio from './RecordAudio';
+import { apiRequest } from '@hooks/useApi';
 
 const maxHeight = 100;
 const maxFileSizeMb = 8;
@@ -63,9 +64,11 @@ function ActionBar() {
             },
             userIds: [currentUserId!, currentChatRoomInfo!.partners[0].id]
         }
-        try {
-            var response = await ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList);
-            const newChatRoomSummary = response.data;
+        const { data: newChatRoomSummary } = await apiRequest({
+            request: () => ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList),
+            onError: () => toast.error('Error creating new chat, please try again!')
+        });
+        if (newChatRoomSummary) {
             handleSetCurrentChatRoomSummary(newChatRoomSummary, true)
             const message: NewMessage = {
                 chatRoomId: newChatRoomSummary.chatRoom.id,
@@ -77,12 +80,7 @@ function ActionBar() {
             setTextInput('');
             navigate('/home/chatlist/chatrooms');
         }
-        catch (err) {
-            toast.error('Error while adding new chat room, please try again later!');
-            console.error(err)
-        }
     }
-
     async function sendMessage() {
         if (selectedFile) {
             await handleSendMessageWithFiles();
@@ -90,7 +88,6 @@ function ActionBar() {
         else {
             await handleSendPlainMessage();
         }
-
     }
 
     async function handleSendPlainMessage() {
@@ -100,20 +97,15 @@ function ActionBar() {
             console.error('userId and chatroom is null');
             return;
         }
-        try {
-            const message: NewMessage = {
-                chatRoomId: currentChatRoomSummary!.chatRoom.id,
-                messageText: trimText,
-                senderId: currentUserId!,
-                replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
-            }
-            await MessageAPI.addMessage(message);
-            setTextInput('');
-            handleSetReplyToMessage(undefined);
+        const message: NewMessage = {
+            chatRoomId: currentChatRoomSummary!.chatRoom.id,
+            messageText: trimText,
+            senderId: currentUserId!,
+            replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
         }
-        catch (err) {
-            console.error('err sending message: ', err);
-        }
+        await apiRequest({ request: () => MessageAPI.addMessage(message) });
+        setTextInput('');
+        handleSetReplyToMessage(undefined);
     }
 
     async function handleSendMessageWithFiles() {
@@ -125,17 +117,17 @@ function ActionBar() {
             replyToMessageId: replyToMessage ? replyToMessage.id : undefined,
             fileName: selectedFile!.name
         }
-        try {
-            const message = (await MessageAPI.addNewMessageForFileUpload(newMessage)).data;
-            if (message.type === 'Files' && message.fileStatus === 'InProgress') {
-                message.files = selectedFile!;
-                handleAddMessageForFileUpload(message)
-            }
-            setTextInput('');
-            setSelectedFile(null);
-        } catch (err) {
-            console.error(err)
+        const { data: message } = await apiRequest({
+            request: () => MessageAPI.addNewMessageForFileUpload(newMessage),
+            onError: () => toast.error('Error sending message, please try again!')
+        });
+        if (message && message.type === 'Files' && message.fileStatus === 'InProgress') {
+            message.files = selectedFile!;
+            handleAddMessageForFileUpload(message)
         }
+        setTextInput('');
+        setSelectedFile(null);
+        handleSetReplyToMessage(undefined);
     }
 
     async function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -181,18 +173,16 @@ function ActionBar() {
             console.error('userId and chatroom is null');
             return;
         }
-        try {
-            const newMessage: NewMessageForAudioRecord = {
-                senderId: currentUserId,
-                chatRoomId: currentChatRoomSummary.chatRoom.id
-            }
-            let message = (await MessageAPI.addNewMessageForAudioRecord(newMessage)).data;
-            if (message.type === 'AudioRecord' && message.fileStatus === 'InProgress') {
-                message.audio = audio;
-                handleAddMessageForFileUpload(message);
-            }
-        } catch (err) {
-            console.error(err)
+        const newMessage: NewMessageForAudioRecord = {
+            senderId: currentUserId,
+            chatRoomId: currentChatRoomSummary.chatRoom.id
+        }
+
+        const { data: message } = await apiRequest({ request: () => MessageAPI.addNewMessageForAudioRecord(newMessage) });
+
+        if (message && message.type === 'AudioRecord' && message.fileStatus === 'InProgress') {
+            message.audio = audio;
+            handleAddMessageForFileUpload(message);
         }
     }
 
@@ -204,7 +194,6 @@ function ActionBar() {
         else {
             messageInputRef.current?.style.setProperty('height', '28px');
         }
-
     }, [textInput])
 
     useEffect(() => {

@@ -1,36 +1,18 @@
 import DownloadIcon from '@mui/icons-material/Download';
 import styles from '@styles/DownloadFileMessage.module.scss';
 import { Message } from '@data-type';
-import { FullMetadata } from 'firebase/storage';
-import { useEffect, useState } from 'react';
 import { MessageAPI } from '@api';
 import FileIcon from '../../../../../components/FileIcon';
 import Skeleton from '@mui/material/Skeleton';
-import { getExtensionFromName, isImageFromFileName } from '@helper/getFileExtensionImage';
+import { getExtensionFromName } from '@helper/getFileExtensionImage';
 import ErrorMessageFile from './ErrorMessageFile';
+import useFetchApi from '@hooks/useApi';
 
 function DownloadFileMessage({ message }: DownloadFileMessageProps) {
-    if (isImageFromFileName(message.fileName)) return;
-    const [metaData, setMetaData] = useState<FullMetadata | null>(null)
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasError, setHasError] = useState(false);
-    useEffect(() => {
-        getMetaData();
-
-        async function getMetaData() {
-            if (message.fileUrls) {
-                setIsLoading(true)
-                try {
-                    var metaData = await MessageAPI.getMessageFileMetaData(message.chatRoomId, message.id);
-                    setMetaData(metaData);
-                } catch (err) {
-                    setHasError(true);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        }
-    }, [])
+    const { data: metaData, hasError, loading: isLoading } = useFetchApi({
+        request: () => MessageAPI.getMessageFileMetaData(message.chatRoomId, message.id),
+        dependencies: [message.chatRoomId, message.id]
+    });
 
     if (hasError) {
         const errorMessage: Message & {
@@ -39,7 +21,6 @@ function DownloadFileMessage({ message }: DownloadFileMessageProps) {
         } = { ...message, type: 'Files', fileStatus: 'Error' }
         return <ErrorMessageFile message={errorMessage} />
     }
-
 
     return (
 

@@ -8,6 +8,7 @@ import { Typography } from '@mui/material';
 
 function SearchedChat({ searchedResult, onClick }: SearchedChat) {
   const [chatNameAndPhoto, setChatNameAndPhoto] = useState<ChatRoomInfo | null>(null);
+  
   useEffect(() => {
     if (isChatRoomSummary(searchedResult)) {
       setChatNameAndPhoto(getChatRoomInfo(searchedResult));

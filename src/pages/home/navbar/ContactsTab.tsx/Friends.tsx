@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import { ChatRoomAPI } from '@api';
 import { useAppSelector } from '../../../../redux/store';
 import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '@hooks/useApi';
+
 function Friends() {
     const [friends, setFriends] = useState<TFriend[]>([]);
     const [filteredFriends, setFilteredFriends] = useState<TFriend[]>([]);
@@ -40,16 +42,18 @@ function Friends() {
                 },
                 userIds: [currentUserId!, friend.user.id]
             }
-            try {
-                var response = await ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList);
-                handleSetCurrentChatRoomSummary(response.data)
-                navigate('/home/chatlist/chatrooms')
-            }
-            catch (err) {
-                toast.error('Error while adding new chat room, please try again later!');
-                console.error(err)
-            }
+            await apiRequest({
+                request: () => ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList),
+                onFinish: (data) => {
+                    data && handleSetCurrentChatRoomSummary(data)
+                    navigate('/home/chatlist/chatrooms')
+                },
+                onError: () => {
+                    toast.error('Error creating new chat, please try again!')
+                }
+            });
         }
+
     }
 
     useEffect(() => {

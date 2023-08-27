@@ -55,9 +55,9 @@ const authSlice = createSlice({
 export function loginWithEmailAndPassword(email: string, password: string) {
   return async (dispatch: Dispatch) => {
     const googleUser = await signInWithEmailAndPassword(email, password);
-    const userResponse = await UserAPI.getUserById(googleUser.user.uid);
-    if (userResponse.data != null) {
-      dispatch(authSlice.actions.logIn(userResponse.data));
+    const userData = await UserAPI.getUserById(googleUser.user.uid);
+    if (userData != null) {
+      dispatch(authSlice.actions.logIn(userData));
     }
   };
 }

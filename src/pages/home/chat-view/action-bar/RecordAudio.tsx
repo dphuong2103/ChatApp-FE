@@ -4,6 +4,8 @@ import { recordingDuration } from '@helper/dateTime';
 import { PaperPlaneRight, Pause, Play, Record, X } from 'phosphor-react';
 import { IconButton, Typography } from '@mui/material';
 import { toast } from 'react-toastify';
+
+//maximum 4 minutes recording
 const maxDuration = (10 * 100) * 60 * 4;
 
 function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps) {

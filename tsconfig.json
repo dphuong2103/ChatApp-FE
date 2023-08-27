@@ -34,7 +34,7 @@
         "assets/*"
       ],
       "@helper/*":["helper/*"],
-      "@hooks":["hooks/*"],
+      "@hooks/*":["hooks/*"],
       "@data-type":["types/dataType.ts"],
       "@api":["api/index.ts"]
     }

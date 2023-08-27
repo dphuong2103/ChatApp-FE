@@ -4,20 +4,22 @@ import { AddMembersToChatGroup, RemoveFromGroupChat, SetMutedDTO, UpdateLastMess
 const API_URL_USERCHATROOM = '/api/userchatrooms';
 
 const UserChatRoomAPI = {
-    updateUserChatRoomLastMessageRead: function (userChatRoom: UpdateLastMessageRead) {
-        return myAxios().put(`${API_URL_USERCHATROOM}/${userChatRoom.id}`, JSON.stringify(userChatRoom));
+    updateUserChatRoomLastMessageRead: async function (userChatRoom: UpdateLastMessageRead) {
+        return await myAxios().put(`${API_URL_USERCHATROOM}/${userChatRoom.id}`, JSON.stringify(userChatRoom));
     },
-    setMuted: function (request: SetMutedDTO) {
-        return myAxios().put<UserChatRoom>(`${API_URL_USERCHATROOM}/${request.id}/setmuted`, JSON.stringify(request));
+    setMuted: async function (request: SetMutedDTO) {
+        const userChatRoomResponse = await myAxios().put<UserChatRoom>(`${API_URL_USERCHATROOM}/${request.id}/setmuted`, JSON.stringify(request));
+        return userChatRoomResponse.data;
     },
-    addMembersToChatGroup: function (request: AddMembersToChatGroup) {
-        return myAxios().post(`${API_URL_USERCHATROOM}/addmembers`, JSON.stringify(request))
+    addMembersToChatGroup: async function (request: AddMembersToChatGroup) {
+
+        return await myAxios().post(`${API_URL_USERCHATROOM}/addmembers`, JSON.stringify(request))
     },
-    removeMemberFromGroupChat: function (request: RemoveFromGroupChat) {
-        return myAxios().put(`${API_URL_USERCHATROOM}/removefromgroupchat`, JSON.stringify(request))
+    removeMemberFromGroupChat: async function (request: RemoveFromGroupChat) {
+        return await myAxios().put(`${API_URL_USERCHATROOM}/removefromgroupchat`, JSON.stringify(request))
     },
-    leavechatroom: function (userChatRoomId: string) {
-        return myAxios().put(`${API_URL_USERCHATROOM}/${userChatRoomId}/leavechatroom`);
+    leavechatroom: async function (userChatRoomId: string) {
+        return await myAxios().put(`${API_URL_USERCHATROOM}/${userChatRoomId}/leavechatroom`);
     }
 }
 export default UserChatRoomAPI;

@@ -1,11 +1,12 @@
 import { createContext, useEffect, useReducer, useState } from 'react';
-import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UpdateLastMessageRead, UploadTask, User } from '@data-type';
+import { ChatRoomInfo, ChatRoomSummary, ChatRoomSummaryActionType, ConnectionFunction, Message, MessagesActionType, NewChat, UploadTask, User } from '@data-type';
 import { useChatRoomSummaryContext, useHubConnection } from '@helper/getContext';
 import { MessageAPI, UserChatRoomAPI } from '@api';
 import { handleGetMessageUploadTask, handleTransFormMessages, handleUpsertOrDeleteMessage } from '@helper/messageHelper';
 import { getChatRoomInfo } from '@helper/chatRoomHelper';
 import { useAppSelector } from '../redux/store';
 import { uploadFileTask } from '../hooks/useUploadFile';
+import useFetchApi, { apiRequest } from '@hooks/useApi';
 
 export const CurrentChatRoomContext = createContext({} as showChatRoomContextProps);
 
@@ -67,7 +68,6 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
     const [currentChatRoomInfo, setCurrentChatRoomInfo] = useState<ChatRoomInfo | null>(null);
     const [newChat, setNewChat] = useState<NewChat | null>(null);
     const [uploadTasks, setUploadTasks] = useState<UploadTask[]>([]);
-
     const currentUser = useAppSelector(state => state.auth.user);
 
     async function handleSetCurrentChatRoomSummary(chatRoomSummary: ChatRoomSummary, newChatRoom?: boolean) {
@@ -81,48 +81,44 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         });
         setShowChatRoom(true);
         if (newChatRoomId === oldChatRoomId) return;
-        dispatchMessage({ type: MessagesActionType.DELETEALL })
+        dispatchMessage({ type: MessagesActionType.DELETEALL });
         if (newChatRoom) return;
         await firstGetMessagesByChatRoomId(chatRoomSummary.chatRoom.id);
-        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen, payload: chatRoomSummary.chatRoom.id })
+        dispatchChatRoomSummary({
+            type: ChatRoomSummaryActionType.UpdateUnReadMessageCountOnChatRoomOpen,
+            payload: chatRoomSummary.chatRoom.id
+        });
     }
 
     async function firstGetMessagesByChatRoomId(chatRoomId: string) {
-        try {
-            const messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(chatRoomId, 30);
-            let messagesData = messagesResponse.data;
-            if (!(uploadTasks.length === 0)) {
-                messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
-            }
-
-            dispatchMessage({ type: MessagesActionType.FIRSTGET, payload: messagesData });
-        } catch (err) {
-            console.error(err);
+        let { data: messagesData } = await apiRequest({ request: () => MessageAPI.getMessagesPageByChatRoomId(chatRoomId, 30) })
+        if (!(uploadTasks.length === 0) && messagesData && messagesData.length > 0) {
+            messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks));
         }
+        messagesData && dispatchMessage({ type: MessagesActionType.FIRSTGET, payload: messagesData });
+
     }
 
     async function getMessagesPageByChatRoomId() {
         if (!messages || !currentChatRoomSummary) return;
-        try {
-            const messagesResponse = await MessageAPI.getMessagesPageByChatRoomId(currentChatRoomSummary.chatRoom.id, 30, messages[0].id);
-            let messagesData = messagesResponse.data;
-            messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
-            dispatchMessage({ type: MessagesActionType.GETLIST, payload: messagesData })
-        } catch (err) {
-            console.error(err);
+        let { data: messagesData } = await apiRequest({ request: () => MessageAPI.getMessagesPageByChatRoomId(currentChatRoomSummary.chatRoom.id, 30, messages[0].id) })
+        if (messagesData) {
+            messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks));
+            dispatchMessage({ type: MessagesActionType.GETLIST, payload: messagesData });
         }
     }
 
     function receivedMessage(message: Message) {
         if (message.chatRoomId === currentChatRoomSummary?.chatRoom.id) {
-            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
-        }
+            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message });
+        };
+
         dispatchChatRoomSummary({
             type: ChatRoomSummaryActionType.UpdateChatRoomSMROnReceiveMessage, payload: {
                 message: message,
                 currentChatRoomId: currentChatRoomSummary?.chatRoom.id,
             }
-        })
+        });
     }
 
     function handleNewChatSelect(user: User) {
@@ -130,7 +126,7 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         setCurrentChatRoomSummary(null);
         setNewChat({ users });
         setShowChatRoom(true);
-        dispatchMessage({ type: MessagesActionType.DELETEALL })
+        dispatchMessage({ type: MessagesActionType.DELETEALL });
         setCurrentChatRoomInfo({
             name: user.displayName,
             imgUrl: user.photoUrl,
@@ -147,20 +143,19 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         fileStatus: 'InProgress'
     }
     )) {
-        console.log(messages);
         if ((message.type === 'Files') && message.fileStatus === 'InProgress') {
             const uploadTask = uploadFileTask(message, () => {
-                setUploadTasks(prev => [...prev].filter(ut => ut !== uploadTask))
+                setUploadTasks(prev => [...prev].filter(ut => ut !== uploadTask));
             });
             message.uploadTask = uploadTask;
             setUploadTasks(prev => [...prev, uploadTask]);
-            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
+            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message });
         }
         else if ((message.type === 'AudioRecord') && message.fileStatus === 'InProgress') {
             const uploadTask = uploadFileTask(message);
             message.uploadTask = uploadTask;
             setUploadTasks(prev => [...prev, uploadTask]);
-            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message })
+            dispatchMessage({ type: MessagesActionType.UPSERTORDELETEMESSAGE, payload: message });
         }
     }
 
@@ -173,23 +168,14 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
         }
     }, [chatRoomSummaries, currentChatRoomSummary, relationships, newChat])
 
-    useEffect(() => {
-        updateLastMessageRead();
-        async function updateLastMessageRead() {
-            if (currentChatRoomSummary && messages.length > 0) {
-                try {
-                    var updateUserChatRoom: UpdateLastMessageRead = {
-                        id: currentChatRoomSummary.userChatRoom.id,
-                        lastMessageReadId: messages[messages.length - 1].id,
-                    }
-                    await UserChatRoomAPI.updateUserChatRoomLastMessageRead(updateUserChatRoom);
-                }
-                catch (err) {
-                    console.error(err);
-                }
-            }
-        }
-    }, [messages])
+    //Update lastmessageread when there is a new message for current chatroom
+    useFetchApi({
+        request: (currentChatRoomSummary && messages.length > 0) ? () => UserChatRoomAPI.updateUserChatRoomLastMessageRead({
+            id: currentChatRoomSummary.userChatRoom.id,
+            lastMessageReadId: messages[messages.length - 1].id,
+        }) : undefined,
+        dependencies: [messages]
+    });
 
     useEffect(() => {
         if (connection && !currentChatRoomSummary) {
@@ -207,40 +193,38 @@ export default function CurrentChatRoom({ children }: { children: React.ReactNod
 
     }, [currentChatRoomSummary, connection?.connectionId])
 
-    //Description: get messages when user reconnect;
-    useEffect(() => {
-        if (connection?.state === 'Connected' && currentChatRoomSummary) {
-            getMissingMessages();
-        }
-
-        async function getMissingMessages() {
-            if (messages.length > 0) {
-                try {
-                    const messagesResponse = await MessageAPI.getMissingMessages(messages[messages.length - 1].id);
-                    if (messagesResponse.data.length > 0) {
-                        let messagesData = messagesResponse.data;
-                        messagesData = messagesData.map(m => handleGetMessageUploadTask(m, uploadTasks))
-                        dispatchMessage({ type: MessagesActionType.GetMissingMessages, payload: messagesData })
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
+    useFetchApi({
+        request: connection?.state === 'Connected' ? () => MessageAPI.getMissingMessages(messages[messages.length - 1].id) : undefined,
+        dependencies: [connection?.state],
+        onFinish: async (data) => {
+            if (data && data.length > 0) {
+                dispatchMessage({ type: MessagesActionType.GetMissingMessages, payload: data.map(m => handleGetMessageUploadTask(m, uploadTasks)) });
             } else {
                 await firstGetMessagesByChatRoomId(currentChatRoomSummary!.chatRoom.id);
             }
-        }
-    }, [connection?.state])
+        },
+    });
 
     useEffect(() => {
         setCurrentChatRoomSummary(prev => {
-            const crs = chatRoomSummaries.find(crs => crs.chatRoom.id === prev?.chatRoom.id)
-            return crs ? { ...crs } : null
+            const crs = chatRoomSummaries.find(crs => crs.chatRoom.id === prev?.chatRoom.id);
+            return crs ? { ...crs } : null;
         })
+
     }, [chatRoomSummaries])
 
     return (
         <CurrentChatRoomContext.Provider value={{
-            showChatRoom, setShowChatRoom, currentChatRoomSummary, handleSetCurrentChatRoomSummary, messages, dispatchMessage, getMessagesPageByChatRoomId, currentChatRoomInfo, newChat, handleNewChatSelect,
+            showChatRoom,
+            setShowChatRoom,
+            currentChatRoomSummary,
+            handleSetCurrentChatRoomSummary,
+            messages,
+            dispatchMessage,
+            getMessagesPageByChatRoomId,
+            currentChatRoomInfo,
+            newChat,
+            handleNewChatSelect,
             handleAddMessageForFileUpload
         }}>{children}</CurrentChatRoomContext.Provider>
     )

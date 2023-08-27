@@ -251,9 +251,9 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
             async function getChatRoomSummaries() {
                 setLoadingChatRoomSummary(true);
                 try {
-                    const chatRoomSummariesResponse = await ChatRoomAPI.getUserChatRooms(abortController);
-                    if (chatRoomSummariesResponse?.data && chatRoomSummariesResponse.data.length > 0) {
-                        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.FIRSTGET, payload: chatRoomSummariesResponse.data })
+                    const chatRoomSummariese = await ChatRoomAPI.getUserChatRooms(abortController);
+                    if (chatRoomSummariese && chatRoomSummariese.length > 0) {
+                        dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.FIRSTGET, payload: chatRoomSummariese })
                     }
                 } catch (err) {
                     console.error(err);
@@ -265,9 +265,9 @@ function ChatRoomSummaryContext({ children }: ContextChildren) {
 
             async function getUserRelationships() {
                 try {
-                    const userRelationships = await UserRelationshipAPI.getUserRelationship(abortController);
-                    if (userRelationships != null) {
-                        setRelationships(userRelationships.data);
+                    const userRelationshipData = await UserRelationshipAPI.getUserRelationship(abortController);
+                    if (userRelationshipData != null) {
+                        setRelationships(userRelationshipData);
                     }
                 } catch (err) {
                     console.error(err);

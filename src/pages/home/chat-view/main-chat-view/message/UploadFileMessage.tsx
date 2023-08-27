@@ -7,6 +7,7 @@ import { X } from 'phosphor-react';
 import { getExtensionFromName, isImageFromFileName } from '@helper/getFileExtensionImage';
 import { MessageAPI } from '@api';
 import { useCurrentChatRoomContext } from '@helper/getContext';
+import { apiRequest } from '@hooks/useApi';
 
 function UploadFileMessage({ message }: UploadFileMessageType) {
     const [uploadFileStatus, setUploadFile] = useState<UploadFileStatus | null>(null);
@@ -25,14 +26,8 @@ function UploadFileMessage({ message }: UploadFileMessageType) {
 
     async function handleCancelUpload() {
         if (!message.uploadTask) return;
-        try {
-            message.uploadTask.cancelTask()
-            await MessageAPI.cancelUploadingMessageFile(message.id);
-            dispatchMessage({ type: MessagesActionType.CancelUploadingMessageFile, payload: message.id })
-        }
-        catch (err) {
-            console.error(err)
-        }
+        await apiRequest({ request: () => MessageAPI.cancelUploadingMessageFile(message.id) })
+        dispatchMessage({ type: MessagesActionType.CancelUploadingMessageFile, payload: message.id });
     }
 
     return (

@@ -1,9 +1,9 @@
 import { Button, Dialog, DialogActions, DialogTitle, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Modal, Typography } from '@mui/material';
 import styles from '@styles/UserInfoModal.module.scss';
 import Avatar from './Avatar';
-import { ChatRoomSummaryActionType, User, UserRelationship } from '@data-type';
+import { ChatRoomSummaryActionType, UserRelationship } from '@data-type';
 import { generateClassName } from '@helper/generateClassName';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { UserAPI, UserRelationshipAPI } from '../api';
 import { useAppSelector } from '../redux/store';
@@ -13,28 +13,19 @@ import { getChatRoomAndUserListByUserIdFromChatRoomSummaries } from '@helper/cha
 import { formatDateFromString } from '@helper/dateTime';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import { toast } from 'react-toastify';
+import useFetchApi from '@hooks/useApi';
+
 function UserInfoModal({ open, userId, relationship, onClose }: UserInfoModalProps) {
     const { chatRoomSummaries, dispatchChatRoomSummary } = useChatRoomSummaryContext();
     const { handleSetCurrentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
     const currentUser = useAppSelector(state => state.auth.user);
-    const [user, setUser] = useState<User | null>(null);
     const [openDeleteFriendDialog, setOpenDeleteFriendDialog] = useState(false);
-    useEffect(() => {
-        getUser();
 
-        async function getUser() {
-            if (userId && open) {
-                try {
-                    var user = (await UserAPI.getUserById(userId)).data;
-                    setUser(user)
-                    dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUser, payload: user })
-                } catch (err) {
-                    console.error(err);
-                }
-            }
-        }
-    }, [userId, open])
-
+    const { data: user } = useFetchApi({
+        request: () => UserAPI.getUserById(userId),
+        dependencies: [userId],
+        onFinish: (data) => { data && dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.UpdateUser, payload: data }) },
+    });
 
     async function handleSendFriendRequest() {
         if (!currentUser || !user!.id) return;
@@ -188,7 +179,7 @@ export default UserInfoModal;
 
 type UserInfoModalProps = {
     open: boolean,
-    userId?: string,
+    userId: string,
     relationship?: UserRelationship,
     onClose: () => void,
 }

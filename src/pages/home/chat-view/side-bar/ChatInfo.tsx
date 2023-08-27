@@ -20,6 +20,7 @@ import UpdateChatRoomNameModal from '../UpdateChangeRoomNameModal';
 import UserInfoModal from '../../../../components/UserInfoModal';
 import UploadAvatar from '../../../../components/UploadAvatar';
 import { toast } from 'react-toastify';
+import { apiRequest } from '@hooks/useApi';
 
 function ChatInfo() {
   const { currentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
@@ -34,30 +35,24 @@ function ChatInfo() {
 
   async function handleClickMute() {
     if (!currentChatRoomSummary) return;
-
-    try {
-      const mutedDTO: SetMutedDTO = {
-        id: currentChatRoomSummary.userChatRoom.id,
-        isMuted: !currentChatRoomSummary.userChatRoom.isMuted,
-      }
-      var userChatRoomResponse = await UserChatRoomAPI.setMuted(mutedDTO);
-      dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.USERTUSERCHATROOM, payload: userChatRoomResponse.data });
+    const mutedDTO: SetMutedDTO = {
+      id: currentChatRoomSummary.userChatRoom.id,
+      isMuted: !currentChatRoomSummary.userChatRoom.isMuted,
     }
-    catch (err) {
-      console.error(err);
+    const { data: userChatRoomData } = await apiRequest({ request: () => UserChatRoomAPI.setMuted(mutedDTO) });
+    if (userChatRoomData) {
+      dispatchChatRoomSummary({ type: ChatRoomSummaryActionType.USERTUSERCHATROOM, payload: userChatRoomData });
     }
   }
 
   async function handleLeave() {
     if (!currentChatRoomSummary?.userChatRoom.id) return;
-    try {
-      await UserChatRoomAPI.leavechatroom(currentChatRoomSummary.userChatRoom.id);
-    } catch (err) {
-      toast.error("Error leaving chat room, please try again later!");
-      console.log(err);
-    } finally {
-      setOpenLeaveChatDialog(true);
-    }
+    await apiRequest({
+      request: () => UserChatRoomAPI.leavechatroom(currentChatRoomSummary.userChatRoom.id),
+      onError: () => toast.error("Error leaving chat room, please try again later!"),
+      onFinish: () => setOpenLeaveChatDialog(true)
+    });
+
   }
 
   function handleClickBack() {
@@ -97,12 +92,15 @@ function ChatInfo() {
             <Avatar imgUrl={currentChatRoomInfo?.imgUrl} name={currentChatRoomInfo?.name} size={5} onClick={handleClickAvatar} />
             <UploadAvatar open={openUploadAvatar} handleClose={() => setOpenUploadAvatar(false)} type='ChatRoomAvatar' />
           </div>
-          <UserInfoModal
-            open={openUserInfoModal}
-            userId={currentChatRoomInfo?.partners[0] ? currentChatRoomInfo?.partners[0].id : undefined}
-            relationship={currentChatRoomInfo?.relationship ? currentChatRoomInfo?.relationship : undefined}
-            onClose={() => setOpenUserInfoModal(false)}
-          />
+          {
+            currentChatRoomInfo?.partners[0] && <UserInfoModal
+              open={openUserInfoModal}
+              userId={currentChatRoomInfo?.partners[0].id}
+              relationship={currentChatRoomInfo?.relationship ? currentChatRoomInfo?.relationship : undefined}
+              onClose={() => setOpenUserInfoModal(false)}
+            />
+          }
+
           <div className={styles['title-container']}>
             <span>{currentChatRoomInfo?.name}</span>
             {

@@ -52,11 +52,14 @@ function NavBar() {
                 (currentChatRoomSummary?.chatRoom.chatRoomType === 'ONE' || !!newChat) &&
                 <NavBarRelationship relationship={currentChatRoomInfo?.relationship ?? null} targetUser={currentChatRoomInfo?.partners[0] ?? null} />
             }
-            <UserInfoModal
-                open={openUserInfoModal}
-                userId={currentChatRoomInfo?.partners[0]?.id}
-                relationship={currentChatRoomInfo?.relationship}
-                onClose={() => setOpenUserInfoModal(false)} />
+            {
+                currentChatRoomInfo?.partners[0] && <UserInfoModal
+                    open={openUserInfoModal}
+                    userId={currentChatRoomInfo?.partners[0].id}
+                    relationship={currentChatRoomInfo?.relationship}
+                    onClose={() => setOpenUserInfoModal(false)} />
+            }
+
         </header >
     )
 }

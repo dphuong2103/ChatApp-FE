@@ -5,9 +5,11 @@ import Avatar from '../../../components/Avatar';
 import { useEffect, useState } from 'react';
 import { ChatRoomAPI } from '@api';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { apiRequest } from '@hooks/useApi';
 function UpdateChatRoomNameModal({ open, chatRoom, onClose, chatRoomInfo }: UpdateChatRoomNameModalProps) {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         if (chatRoom?.name) {
             setName(chatRoom.name);
@@ -21,19 +23,16 @@ function UpdateChatRoomNameModal({ open, chatRoom, onClose, chatRoomInfo }: Upda
 
     async function handleSubmitUpdateName() {
         if (!chatRoom) return;
-        try {
-            setLoading(true);
-            const request: ChatRoomIdAndName = {
-                chatRoomId: chatRoom.id,
-                name: name
-            }
-            await ChatRoomAPI.updateChatRoomName(request);
-            onClose();
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false);
+        const request: ChatRoomIdAndName = {
+            chatRoomId: chatRoom.id,
+            name: name
         }
+        await apiRequest({
+            request: () => ChatRoomAPI.updateChatRoomName(request),
+            onStart: () => setLoading(true),
+            onFinish: () => onClose(),
+            onFinally: () => setLoading(false),
+        })
     }
 
     return (

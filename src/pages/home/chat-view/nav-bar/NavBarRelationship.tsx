@@ -6,56 +6,62 @@ import { Typography, Button } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { ChatRoomAPI, UserRelationshipAPI } from '@api';
 import { useCurrentChatRoomContext } from '@helper/getContext';
+import { apiRequest } from '@hooks/useApi';
+import { toast } from 'react-toastify';
 function NavBarRelationship({ relationship, targetUser }: NavBarRelationshipProps) {
   const { newChat, handleSetCurrentChatRoomSummary, currentChatRoomInfo } = useCurrentChatRoomContext();
   const currentUser = useAppSelector(state => state.auth.user);
 
   async function handleSendFriendRequest() {
     if (!currentUser || !targetUser?.id) return;
+
     if (newChat) {
       await handleCreateChatRoom();
       return;
     }
-    try {
-      await UserRelationshipAPI.sendFriendRequest(currentUser.id, targetUser.id);
-    } catch (err) {
-      console.error(err);
-    }
+
+    await apiRequest({ request: () => UserRelationshipAPI.sendFriendRequest(currentUser.id, targetUser.id) })
   }
 
   async function handleCreateChatRoom() {
-    try {
-      const newChatRoomAndUserList: NewChatRoomAndUserList = {
-        newChatRoom: {
-          chatRoomType: ChatRoomType.ONE,
-          creatorId: currentUser!.id
-        },
-        userIds: [currentUser!.id, targetUser!.id]
-      }
-      var response = await ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList);
-      const newChatRoomSummary = response.data;
+    const newChatRoomAndUserList: NewChatRoomAndUserList = {
+      newChatRoom: {
+        chatRoomType: ChatRoomType.ONE,
+        creatorId: currentUser!.id
+      },
+      userIds: [currentUser!.id, targetUser!.id]
+    };
+
+    const { data: newChatRoomSummary } = await apiRequest({
+      request: () => ChatRoomAPI.addNewChatRoom(newChatRoomAndUserList),
+      onError: () => toast.error('Error creating new chat, please try again!')
+    });
+
+    if (newChatRoomSummary) {
       handleSetCurrentChatRoomSummary(newChatRoomSummary)
       await UserRelationshipAPI.sendFriendRequest(currentUser!.id, targetUser!.id);
-    } catch (err) {
-      console.error(err);
     }
   }
 
   async function handleCancelFriendRequest() {
     if (!relationship) return;
-    try {
-      await UserRelationshipAPI.cancelFriendRequest(relationship.id);
-    } catch (err) {
-      console.error(err);
+    await apiRequest({
+      request: () => UserRelationshipAPI.cancelFriendRequest(relationship.id),
+      onError: handleError
+    })
+    function handleError(_error: unknown) {
+      toast.error('Error sending friend request, please try again later!');
     }
   }
 
   async function handleAcceptFriendRequest() {
     if (!relationship) return;
-    try {
-      await UserRelationshipAPI.acceptFriendRequest(relationship);
-    } catch (err) {
-      console.error(err);
+    await apiRequest({
+      request: () => UserRelationshipAPI.acceptFriendRequest(relationship),
+      onError: handleError
+    })
+    function handleError(_error: unknown) {
+      toast.error('Error accepting friend request, please try again later!');
     }
   }
 

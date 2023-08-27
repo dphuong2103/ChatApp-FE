@@ -4,6 +4,7 @@ import styles from '@styles/FriendRequest.module.scss'
 import { UserRelationship } from '@data-type';
 import { generateClassName } from '@helper/generateClassName';
 import { UserRelationshipAPI } from '@api';
+import { apiRequest } from '@hooks/useApi';
 function FriendRequest({ friendRequest, type }: FriendRequestProps) {
     if (type === 'unknown') return;
     if (type === 'receive' && !friendRequest.initiatorUser) return;
@@ -20,11 +21,7 @@ function FriendRequest({ friendRequest, type }: FriendRequestProps) {
 
     async function handleCancelFriendRequest() {
         if (!friendRequest) return;
-        try {
-            await UserRelationshipAPI.cancelFriendRequest(friendRequest.id);
-        } catch (err) {
-            console.error(err);
-        }
+        await apiRequest({ request: () => UserRelationshipAPI.cancelFriendRequest(friendRequest.id) })
     }
     return <div className={styles['friend-request-container']}>
         <div className={styles['card']}>

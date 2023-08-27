@@ -1,4 +1,5 @@
 import { ChatRoom, ChatRoomSummary, NewChat, User } from '@data-type';
+import { AxiosResponse } from 'axios';
 
 export function isChatRoom(object: unknown): object is ChatRoom {
     if (object != null && typeof object === "object") {
@@ -23,4 +24,8 @@ export function isUser(object: unknown): object is User {
         return 'email' in object;
     }
     else return false;
+}
+
+export function isAxiosResponse(object: unknown): object is AxiosResponse {
+    return object !== null && typeof object === 'object' && 'data' in object && 'statusText' in object
 }

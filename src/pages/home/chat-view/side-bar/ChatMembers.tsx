@@ -8,12 +8,14 @@ import MemberMenu from './MemberMenu';
 import { useOutsideClick } from '../../../../hooks/useClickOutside';
 import { UserChatRoomAPI } from '@api';
 import { useCurrentChatRoomContext } from '@helper/getContext';
+import { apiRequest } from '@hooks/useApi';
 function ChatMembers({ users }: ChatMembersProps) {
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [menuContainerAnchorEl, setMenuContainerAnchorEl] = useState<HTMLElement | null>(null);
     const menuContainerRef = useOutsideClick(() => handleMenuClose(), menuContainerAnchorEl);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const { currentChatRoomSummary } = useCurrentChatRoomContext();
+
     function handleMenuClick(e: HTMLElement, user: User) {
         if (e == menuContainerAnchorEl) {
             setMenuContainerAnchorEl(null);
@@ -31,16 +33,11 @@ function ChatMembers({ users }: ChatMembersProps) {
 
     async function handleRemoveFromChat() {
         if (!selectedUser || !currentChatRoomSummary) return;
-        try {
-            const request: RemoveFromGroupChat = {
-                chatRoomId: currentChatRoomSummary.chatRoom.id,
-                userId: selectedUser.id,
-            }
-            await UserChatRoomAPI.removeMemberFromGroupChat(request);
+        const request: RemoveFromGroupChat = {
+            chatRoomId: currentChatRoomSummary.chatRoom.id,
+            userId: selectedUser.id,
         }
-        catch (err) {
-            console.error(err)
-        }
+        await apiRequest({ request: () => UserChatRoomAPI.removeMemberFromGroupChat(request) });
     }
 
     return (

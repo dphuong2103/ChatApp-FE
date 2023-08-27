@@ -21,9 +21,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
+
 const provider = new GoogleAuthProvider();
+
 provider.setCustomParameters({ prompt: 'select_account' });
+
 export function signInWithEmailAndPassword(email: string, password: string) {
   return signInWithEmail(auth, email, password);
 }
@@ -53,7 +57,7 @@ type updateInfo = {
 }
 
 export function updateFirebaseUserInfo(updateInfo: updateInfo) {
-  return updateProfile(auth.currentUser!, updateInfo)
+  return updateProfile(auth.currentUser!, updateInfo);
 }
 
 export const storage = getStorage(app);

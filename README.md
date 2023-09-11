@@ -17,7 +17,7 @@ cd ChatApp-FE
 ```bash
 npm install
 ```
-  ##### create a firebase-config.ts in firebase folder, create a variable  and change firebaseConfig as your config then start development server
+  ##### create a firebase-connection.ts in firebase folder, create a variable  and change firebaseConfig as your config then start development server
 const firebaseConnection = {
     'firebase connection here'
 };

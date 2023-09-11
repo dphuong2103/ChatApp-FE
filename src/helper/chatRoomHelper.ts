@@ -1,6 +1,6 @@
 import store from '../redux/store';
 import { ChatRoomInfo, ChatRoomSummary, ChatRoomType, RelationshipStatus, User, UserRelationship } from '@data-type';
-import { stringContains } from './checkString';
+import { stringContains } from './stringHelper';
 import { isChatRoomSummary, isUser } from './checkType';
 import { getRelationship, getRelationshipStatus } from './relationshipHelper';
 

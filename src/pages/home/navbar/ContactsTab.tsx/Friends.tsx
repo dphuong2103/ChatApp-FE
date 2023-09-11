@@ -5,7 +5,7 @@ import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/ge
 import { getContactAndChatRooms } from '@helper/contactHelper';
 import Friend from './Friend';
 import { useSearchInput } from './ContactTab';
-import { stringContains } from '@helper/checkString';
+import { stringContains } from '@helper/stringHelper';
 import { toast } from 'react-toastify';
 import { ChatRoomAPI } from '@api';
 import { useAppSelector } from '../../../../redux/store';

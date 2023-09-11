@@ -14,11 +14,12 @@ function ChatContent() {
   const chatContentContainerRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const lastMessageRef = useRef<Element | null>(null);
-  const { messages, getMessagesPageByChatRoomId } = useCurrentChatRoomContext();
+  const { messages, getMessagesPageByChatRoomId, currentChatRoomSummary } = useCurrentChatRoomContext();
   const { relationships } = useChatRoomSummaryContext();
   const currentUser = useAppSelector(state => state.auth.user?.id);
   const [selectedUserWithRelationship, setSelectedUserWithRelationship] = useState<UserWithRelationship | null>(null);
   const [openUserInfoModal, setOpenUserInfoModal] = useState(false);
+
   useEffect(() => {
     if (!isScrolling) {
       chatContentContainerRef.current?.scrollIntoView(
@@ -29,6 +30,10 @@ function ChatContent() {
       setIsScrolling(false);
     }
   }, [messages]);
+
+  useEffect(() => {
+    setIsScrolling(false);
+  }, [currentChatRoomSummary])
 
   const handleOnScroll = async () => {
     const eligibleToGetNewMessages = containerScrollableRef.current?.scrollTop == 0
@@ -70,7 +75,6 @@ function ChatContent() {
           {
             block: 'end',
             inline: 'nearest',
-            behavior: 'smooth'
           })
       }, 100)
     }

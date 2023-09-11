@@ -4,7 +4,7 @@ import { useSearchInput } from './ChatListTab';
 import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
 import SearchedChat from './SearchedChat';
 import { ChatRoomSummary, User } from '@data-type';
-import { isValidEmail } from '@helper/checkString';
+import { isValidEmail } from '@helper/stringHelper';
 import { UserAPI } from '@api';
 import { useDebounce } from '../../../../hooks/useDounceSearch';
 import { filterChatRoom, removeDuplicateChat } from '@helper/chatRoomHelper';

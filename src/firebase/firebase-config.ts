@@ -9,15 +9,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { getStorage, ref } from "firebase/storage";
-const firebaseConfig = {
-  apiKey: 'AIzaSyAt-y2HeEl0hWLey_vDn6EJ9Mo0oqcFdC8',
-  authDomain: 'chat-app-35d62.firebaseapp.com',
-  projectId: 'chat-app-35d62',
-  storageBucket: 'chat-app-35d62.appspot.com',
-  messagingSenderId: '240654264877',
-  appId: '1:240654264877:web:2c25093dce9df3bad8a6a4',
-  measurementId: 'G-806DG99TS8',
-};
+import firebaseConnection from './firebase-connection';
+const firebaseConfig = firebaseConnection;
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -57,7 +50,7 @@ type updateInfo = {
 }
 
 export function updateFirebaseUserInfo(updateInfo: updateInfo) {
-  return updateProfile(auth.currentUser!, updateInfo);
+  return updateProfile(auth.currentUser!, updateInfo)
 }
 
 export const storage = getStorage(app);

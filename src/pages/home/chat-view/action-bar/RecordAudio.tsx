@@ -103,6 +103,10 @@ function RecordAudio({ stopRecording, isRecording, onSubmit }: RecordAudioProps)
     async function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
         e?.preventDefault();
         intervalRef.current && clearTimeout(intervalRef.current)
+        if (duration <= 1000) {
+            toast.warning('Audio is too short!');
+            return;
+        }
         setTimeout(async () => {
             mediaRecorderRef.current?.stop();
             const newBlob = new Blob(chunksRef.current, { type: 'audio/webm' });

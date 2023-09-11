@@ -8,7 +8,7 @@ import { AddMembersToChatGroup, NewChatRoom, NewChatRoomAndUserList, User as TUs
 import { useAppSelector } from '../../redux/store';
 import SelectedPartner from './SelectedPartner';
 import { useChatRoomSummaryContext, useCurrentChatRoomContext } from '@helper/getContext';
-import { stringContains } from '@helper/checkString';
+import { stringContains } from '@helper/stringHelper';
 import { ChatRoomAPI, UserChatRoomAPI } from '@api';
 import { generateClassName } from '@helper/generateClassName';
 import { isChatRoomSummary } from '@helper/checkType';
